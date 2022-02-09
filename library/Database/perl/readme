@@ -1,0 +1,18 @@
+CPAN command:
+
+perl -MCPAN -e "shell"
+cpan> install <package_name>
+
+perl modules required:
+
+Image::Size 
+
+
+Coding style:
+according to http://kulnet.kuleuven.be/perlcourse/perlingo.html
+
+
+Further required software:
+latex
+convert (ImageMagick)
+identify (ImageMagick)

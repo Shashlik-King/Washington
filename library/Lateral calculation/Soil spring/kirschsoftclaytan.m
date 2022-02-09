@@ -1,0 +1,142 @@
+function [kttop ktbot] = kirschsoftclaytan(element,pile,loads,y_topbottom,i)
+%--------------------------------------------------------------------------
+% PURPOSE
+% Compute the tangent spring stiffness [kN/m/m] in the top and the bottom of
+% each pile segment by applying p-y curves for soft clay according to Kirsch (2014).
+%
+% INPUT:  springinput   : cf. mainfile [D Su gamma IDcyc/sta eps50 J]
+%                         1 = static behaviour (IDcyc/sta)
+%                         2 = cyclic behaviour (IDcyc/sta)
+%         putot         : capacity [kN/m] in top and bottom of element
+%         heqv          : Equivalent length for top and bottom of element
+%         zrtot         : Transition depth [m] - moderate to deep
+%         u             : Global displacement vector
+%         i             : Counter referring to element number
+%
+% OUTPUT: kttop   : Soil stiffness at the top of the element [kN/m/m]
+%         ksbot   : Soil stiffness at the bottom of the element [kN/m/m]
+%
+% CODE            : MUOE
+% APPROVED        : MMOL
+%
+% LAST MODIFIED   : MUOE   30.09.2015   Programming
+%--------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------
+% Initializing pile and soil parameters
+% -------------------------------------------------------------------------
+D       = pile.diameter;            % Outer diameter [m]
+eps50   = element.epsilon50(i);     % strain which occurs at 50% of failure
+
+% -------------------------------------------------------------------------
+% Secant stiffness, ks
+% -------------------------------------------------------------------------
+
+kt = NaN(2,1); %preallocation
+for top_bottom = 1:2 %first the top node spring, thereafter the bottom node spring
+    % Initializing parameters
+    pu = element.pu(i,top_bottom); % [kN/m] Ultimate resistance, determined in layer.m
+    zr = element.hr(i,top_bottom); % [m] Transition depth
+    x  = element.heqv(i,top_bottom); % [m] Equivalent depth, according to Georgiadis' principle
+    y  = y_topbottom(top_bottom); % [m] horizontal displacement
+    Es = element.Es(i)/1E3; % [MPa] Large-strain constrained modulus 
+    Esd =10^(-0.42*log10(0.0006*Es))*Es; % [MPa] Small-strain constrained modulus
+    yyslim1 = 8.0;
+    yyclim1 = 3.0;
+    yyclim2 = 15.0;
+    
+    tol = 0.001*eps50; %SPSO modified
+    
+    e50mod = eps50;
+    yc = 2.5*e50mod*D;
+    
+    % -------- Static criterion -----------------------------------------------
+    if strcmp(loads.static_cyclic,'static')
+        
+        % iteration to find eps50mod
+        eps50mod = min(eps50*(1+(1-0.50*(y/yc)^(1/3))*(Es/Esd-1)),eps50); %SPSO modified
+        while abs(e50mod-eps50mod) > tol && abs(eps50mod-eps50)>0.001*eps50 %SPSO added part from &&
+            e50mod = (e50mod+eps50mod)/2;
+            ycmod = 2.5*e50mod*D;
+            eps50mod = min(eps50*(1+(1-0.50*(y/ycmod)^(1/3))*(Es/Esd-1)),eps50); %SPSO modified
+        end    
+        ycmod = 2.5*eps50mod*D;
+        
+        %iteration to find yini
+        yini=0.1*ycmod; %new
+        delta_yini=abs(y-yini);%new
+        while delta_yini>0.0001%new
+            eps50mod_ini = min(eps50*(1+(1-0.50*(yini/ycmod)^(1/3))*(Es/Esd-1)),eps50); %new
+            while abs(e50mod-eps50mod_ini) > tol%new
+                e50mod = (e50mod+eps50mod_ini)/2;%new
+                ycmod_ini = 2.5*e50mod*D;%new
+                eps50mod_ini = min(eps50*(1+(1-0.50*(yini/ycmod_ini)^(1/3))*(Es/Esd-1)),eps50); %new
+            end  %new
+            ycmod_ini = 2.5*eps50mod_ini*D;%new
+            delta_yini=abs(yini-0.1*ycmod_ini);%new
+            yini=0.1*ycmod_ini;%new
+        end%new
+        
+        kini = (0.23208*pu)/(yini); %SPSO modified
+        
+        if y == 0
+            kt(top_bottom)  = kini;
+        elseif y/ycmod <= yyslim1
+            if pu/2*(y/ycmod)^(1/3)>kini*y
+                kt(top_bottom)  = kini;
+            else
+                kt(top_bottom)  = pu/(6*ycmod^(1/3)*y^(2/3));
+            end
+        else
+            kt(top_bottom)  = 0;
+        end
+        
+    % -------- Cyclic criterion -----------------------------------------------
+    elseif strcmp(loads.static_cyclic,'cyclic')
+        
+        % iteration to find eps50mod
+        eps50mod = min(eps50*(1+(1-0.50/0.72*(y/yc)^(1/3))*(Es/Esd-1)),eps50); %SPSO modified
+        while abs(e50mod-eps50mod) > tol && abs(eps50mod-eps50)>0.001*eps50 %SPSO added part from &&
+            e50mod = (e50mod+eps50mod)/2;
+            ycmod = 2.5*e50mod*D;
+            eps50mod = min(eps50*(1+(1-0.50/0.72*(y/ycmod)^(1/3))*(Es/Esd-1)),eps50); %SPSO modified
+        end    
+        ycmod = 2.5*eps50mod*D;
+        
+        %iteration to find yini
+        yini=0.1*ycmod; %new
+        delta_yini=abs(y-yini);%new
+        while delta_yini>0.0001%new
+            eps50mod_ini = min(eps50*(1+(1-0.50/0.72*(yini/ycmod)^(1/3))*(Es/Esd-1)),eps50); %new
+            while abs(e50mod-eps50mod_ini) > tol%new
+                e50mod = (e50mod+eps50mod_ini)/2;%new
+                ycmod_ini = 2.5*e50mod*D;%new
+                eps50mod_ini = min(eps50*(1+(1-0.50/0.72*(yini/ycmod_ini)^(1/3))*(Es/Esd-1)),eps50); %new
+            end  %new
+            ycmod_ini = 2.5*eps50mod_ini*D;%new
+            delta_yini=abs(yini-0.1*ycmod_ini);%new
+            yini=0.1*ycmod_ini;%new
+        end%new
+        
+        kini = (0.23208*pu)/(yini); %SPSO modified
+            
+        if y == 0
+            kt(top_bottom)  = kini;
+        elseif y/ycmod <= yyclim1
+            if pu/2*(y/ycmod)^(1/3)>kini*y
+                kt(top_bottom)  = kini;
+            else
+                kt(top_bottom)  = pu/(6*ycmod^(1/3)*y^(2/3));
+            end
+        elseif x > zr && y/ycmod > yyclim1
+            kt(top_bottom)  = 0;
+        elseif x <= zr && y/ycmod > yyclim1 && y/ycmod <= yyclim2
+            kt(top_bottom)  = -0.06*pu*(1-x/zr)/ycmod;
+        elseif x <= zr && y/ycmod > yyclim2
+            kt(top_bottom)  = 0;
+        end
+    end
+end
+
+kttop=kt(1);
+ktbot=kt(2);

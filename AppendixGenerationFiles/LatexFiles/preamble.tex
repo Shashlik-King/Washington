@@ -1,0 +1,123 @@
+%% Preamble file
+\usepackage{blindtext}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{titlesec}
+\usepackage{times}
+\usepackage[dvips]{pict2e}
+\usepackage{rotating}
+\usepackage{graphicx} 		% Used for triming figures
+	% trim={<left> <lower> <right> <upper>}
+\usepackage[usenames]{color}
+\usepackage{colortbl}
+\usepackage{lscape}
+\usepackage{fancyhdr}
+\usepackage[a4paper]{geometry}
+%\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=2.5cm]{geometry} 	
+\usepackage{pstricks}
+\usepackage{pdfpages}
+\usepackage{subcaption} 	% Used for being able to create subfigures with captions
+\usepackage{float}
+\usepackage{multirow}
+%\usepackage{xcolor} 	 	% Used for being able to define specific RGB color - not needed as this is already included
+\usepackage{longtable}
+\usepackage{rotating}
+
+
+\usepackage{etoolbox} % Used for removing the "clear-page" function at chapter pages
+\patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{fancy}}{}{}	% Command used from the "etoolbox" package
+
+%\setlength{\evensidemargin}{0cm}
+\setlength{\oddsidemargin}{4cm}	 	% For front page
+%\setlength{\topmargin}{0cm}
+\setlength{\textwidth}{15.5cm}
+\setlength{\textheight}{24cm}
+\setlength{\parindent}{0cm}
+
+\renewcommand\familydefault{\sfdefault}
+
+% Figure and table caption changes
+\usepackage[format=hang,
+            labelfont={small,it},
+            labelsep=quad,
+            textfont={small,it}]{caption}
+\renewcommand\thefigure{\thechapter-\arabic{figure}}
+\renewcommand\thetable{\thechapter-\arabic{table}}
+
+\captionsetup{justification=raggedright,singlelinecheck=false} 	% Left aligning the captions 
+
+
+
+%% Define new font
+\titleformat{\section}
+  {\normalfont\fontfamily{phv}\fontsize{16}{19}\selectfont}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\fontfamily{phv}\fontsize{14}{17}\selectfont}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\fontfamily{phv}\fontsize{14}{17}\selectfont}{\thesubsubsection}{1em}{}
+
+
+
+
+%\usepackage{tgbonum}
+%\setmainfont{Verdana}%[⟨font features⟩]
+%\usepackage{fontspec}[Verdana]
+%\defaultfontfeatures{Mapping=text-text}
+%\setsansfont{Verdana}
+%\renewcommand*{\familydefault}{\sfdefault}
+
+
+%% Define headings (Chapter, sections etc.)
+
+%%%%%%%%%%%%%%%%%\newfontfamily\headingfont[]{Verdena}
+
+
+% Define colors 
+\definecolor{COWI}{RGB}{240,78,35}
+\definecolor{dgrey}{rgb}{0.9,0.9,0.9}
+% rgb = [240,78,35]
+\usepackage{color,soul}
+
+
+
+%% Defined commands
+\DeclareRobustCommand{\ID_location}{\input{AppendixGenerationFiles/ProjectLocation/ID_location}\unskip}
+\DeclareRobustCommand{\Project_client}{\input{AppendixGenerationFiles/ProjectSite/Project_client}\unskip}
+\DeclareRobustCommand{\Project_name}{\input{AppendixGenerationFiles/ProjectSite/Project_name}\unskip}
+\DeclareRobustCommand{\Project_number}{\input{AppendixGenerationFiles/ProjectSite/Project_number}\unskip}
+\DeclareRobustCommand{\Document_date}{\input{AppendixGenerationFiles/ProjectSite/Document_date}\unskip}
+\DeclareRobustCommand{\Document_number}{\input{AppendixGenerationFiles/ProjectSite/Document_number}\unskip}
+\DeclareRobustCommand{\water_depth}{\input{AppendixGenerationFiles/ProjectLocation/water_depth}\unskip}
+\DeclareRobustCommand{\piledepth}{\input{AppendixGenerationFiles/ProjectLocation/pile_depth}\unskip}
+\DeclareRobustCommand{\MPtop}{\input{AppendixGenerationFiles/ProjectLocation/MP_top}\unskip}
+\DeclareRobustCommand{\MP_bottom}{\input{AppendixGenerationFiles/ProjectLocation/MP_bottom}\unskip}
+\DeclareRobustCommand{\pile_length}{\input{AppendixGenerationFiles/ProjectLocation/pile_length}\unskip}
+\DeclareRobustCommand{\AxialCapacity}{\input{AppendixGenerationFiles/ProjectLocation/AxialCapacity}\unskip}
+%\DeclareRobustCommand{\ID_location}{\input{AppendixGenerationFiles/ProjectLocation/ID_location}\unskip}
+%\DeclareRobustCommand{\ID_location}{\input{AppendixGenerationFiles/ProjectLocation/ID_location}\unskip}
+
+
+% \usepackage{titlesec} 	% The package is read above previously
+%\titleformat{\chapter}[display]   
+%{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{10pt}{\Huge}   
+
+
+
+%% Headings and ToC related 
+\setcounter{tocdepth}{1}		% Define how much data included in the ToC (1: Section, 2: subsection...)
+\titleformat{\chapter}[hang] 
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{1em}{} 
+\titleformat{\chapter}{\normalfont\huge}{\thechapter}{25pt}{\huge}
+\titlespacing*{\chapter}{0pt}{-20pt}{10pt}		% Adjust the spacing before and after chapter
+
+\usepackage{tocloft}
+
+%% Hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
