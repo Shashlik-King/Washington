@@ -9,7 +9,7 @@ function [scour soil pile loads settings] = manual_data_input_excel(pile,data,so
 %% Data import
 %--------------------------------------------------------------------------
 
-[num,txt] = xlsread('manual_data_input_AYBR1.xlsx',data.location);
+[num,txt] = xlsread('manual_data_input.xlsx',data.location);
 
 
 n_layers = num(1,2);

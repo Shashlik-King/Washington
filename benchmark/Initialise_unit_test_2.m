@@ -1,11 +1,11 @@
-function [ID,settings,soil,loads,data,plots] = Initialise()
-ID = {'Ak_Pisa_WTG69_Validation'};
+function [ID,settings,soil,pile,loads,data,plots] = Initialise()
+ID = {'benchmark'};
 %--------------------------------------------------------------------------
 %% Soil and pile input
 %--------------------------------------------------------------------------
 settings.database               = 'Manual';       % if 'Database' the database module is activated. If 'Manual' input is taken from manual_data_input.xlsx
-settings.PISA_database          = 0;              % Switch for PISA database usage (1 = on, 0 = off)
-
+settings.PISA_database          = 1;              % Switch for PISA database usage (1 = on, 0 = off)
+settings.psf_switch = 0;
 % interim settings
 settings.interimloads           = 0;
 settings.interimgeometry        = 0;
@@ -36,11 +36,11 @@ settings.db_name                ='ewdb';     % Database name
 settings.nelem_factor           = 1;        % [m-1] minimum number of pile beam elements per meter 2.2
 settings.j_max                  = 100;      % max. no. of iterations in a load step (lateral only)
 settings.TOL                    = 1e-4;     % relative tolerance (lateral and axial)
-settings.n_max                  = 1;        % number of load steps (lateral and axial)
+settings.n_max                  = 100;        % number of load steps (lateral and axial)
 %--------------------------------------------------------------------------
 %% Calculation settings (axial)
 %--------------------------------------------------------------------------
-settings.axial_loading          = 1;        % calculate capacity for axial loading? 1 = yes, 0 = no
+settings.axial_loading          = 0;        % calculate capacity for axial loading? 1 = yes, 0 = no
 settings.clay_type              = 'alpha';  % 'alpha' or 'beta' for way to calculate skin friction in API clay
 settings.analysis_type          = 0;        % 0 = normal axial assessment, 1 = settlements
 settings.analysis_loading       = {'Comp'}; % {'Tens'} = tension only, {'Comp'} = compression only, {'Tens', 'Comp'} = both 
@@ -52,7 +52,7 @@ plots.normal_force_axial        = 0;        % Normal force plot. 1 = yes, 0 = no
 plots.UR_axial                  = 0;        % utilization ratio for axial capacity
 plots.load_deflection_axial		= 0;		% 1 = yes (should not be combined with other plots; minimum 300 load steps are recommended), 0 = no
 plots.deflection_plot_axial     = 0;        % Axial displacement along the pile, 0 = no, 1 = yes
-
+plots.py_curve_UR = 0;
 pile.plug_unplug.tens           = 0;        % plug/unplug control in tension - 0 = auto, 1 = plugged, 2 = unplugged
 pile.plug_unplug.comp           = 0;        % plug/unplug control in compression - 0 = auto, 1 = plugged, 2 = unplugged
 pile.extra_L                    = 20;       % [m] extra pile length to be used in axial capacity plot
@@ -87,7 +87,7 @@ plots.utilization_ratio         = 0;        % 1 = yes, 0 = no, settings.toe_shea
 plots.deflection_bundle         = 0;        % 1 = yes, 0 = no
 plots.toe_shear_graph           = 0;        % 1 = yes, 0 = no
 plots.permanent_rot_def         = 0;        % 1 = yes (minimum 10 load steps is recommended), 0 = no -- cannot be used together with other analyses
-plots.load_deflection			= 0;		% 1 = yes (should not be combined with other plots; minimum 50 load steps us recommended), 0 = no
+plots.load_deflection			= 1;		% 1 = yes (should not be combined with other plots; minimum 50 load steps us recommended), 0 = no
 plots.load_deflection_type      = 0;		% 0 = DNV-Gl / BSH , 1 = regular load-displacement
 plots.moment_distribution		= 0;		% 1 = yes, 0 = no
 
@@ -126,10 +126,10 @@ settings.PSI                    = 0;        % Create PSI file? 1 = yes, 0 = no
 settings.ANSYS                  = 0;        % Create ANSYS ASAS file? 1 = yes, 0 = no
 settings.appendix               = 0;        % Create appendix for report (calculation log)? 1 = yes, 0 = no
 data.save_path                  = 'output\';% Saves files in defined working folder, for current 'pwd'
-settings.SSI2db                 = 1;        % Save SSI-curves in database? 1 = yes, 0 = no
+settings.SSI2db                 = 0;        % Save SSI-curves in database? 1 = yes, 0 = no
 settings.update_db              = 0;        % update the results in MySQL database (1 = yes, 0 = no)
 settings.save_plots             = 0;        % save plots in output folder (1 = yes, 0 =no)
-settings.multi_toe_levels       = 1;        % upload to DB toe springs for more than one level (1 = yes, 0 = no)
+settings.multi_toe_levels       = 0;        % upload to DB toe springs for more than one level (1 = yes, 0 = no)
 settings.damping 				= 0;        % uploads needed input for soil damping to excel (1 = yes, 0 = no)
 settings.SESAM                  = 0;        % Export Linearised springs for SESAM
 settings.PISA_cal_save          = 0;        % Saving moment, shear, etc. for PISA SSI spring calibration

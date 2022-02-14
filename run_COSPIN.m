@@ -7,19 +7,20 @@ clc
 %--------------------------------------------------------------------------
 % Units: kN, m, s, kPa
 %--------------------------------------------------------------------------
-addpath (genpath('library'));                           %make sure all the functions are available
-[ID,settings,soil,loads,data,plots] = Initialise();
-for loc = 1:length(WTGlocation)
+addpath (genpath('library'));   
+addpath (genpath('input'));   %make sure all the functions are available
+[ID,settings,soil,pile,loads,data,plots] = Initialise();
+for loc = 1:length(ID)
 %% Project data
 %--------------------------------------------------------------------------
 data.project                    = 'XXXX';   % 'Project name'
 data.A_number                   = 'AXXXXXXX';   % 'Project number'
-data.location                   = ID;   % 'Project location'
-data.db_location                = ID;
-data.db_location_geo            = ID; %'Database location to read data
+data.location                   = ID{loc};   % 'Project location'
+data.db_location                = ID{loc};
+data.db_location_geo            = ID{loc}; %'Database location to read data
 data.prepared_by                = 'XXXX';   %  Initials of preparer
-data.zoneID                     = ID;
-data.id                         = ID; % Id to store into the database   
+data.zoneID                     = ID{loc};
+data.id                         = ID{loc}; % Id to store into the database   
 data.revision.global            = 1;   % global revision no. for selected location to be used,
                                         %1000 detects corresponding soil, structure and load revision no. automatically
                                         %-1 reads the settings below 
@@ -229,6 +230,22 @@ end
 if settings.SESAM
     [Stiff_node_py,Stiff_node_mtheta] = SESAM(node,scour,pile,data,element,loads,u,ustep,settings,output); % FKMV addition
 	QA_springs(data,loads,soil,scour,settings,pile)
+end
+
+if plots.deflection_plot
+%     fid= fopen('output/deflection.txt','w');
+%     fprintf(fid,'%.5f',output.hor_defl);
+%     fclose(fid);
+    writematrix(output.hor_defl,'output/deflection.txt','Delimiter','tab')
+elseif plots.load_deflection
+%     fid= fopen('output/disp.txt','w');
+%     fprintf(fid,'%.5f',output.def_calibration);
+%     fclose(fid);
+%     fid= fopen('output/load.txt','w');
+%     fprintf(fid,'%.5f',output.force_calibration);
+%     fclose(fid);
+    writematrix(output.def_calibration,'output/disp.txt','Delimiter','tab')
+    writematrix(output.force_calibration,'output/load.txt','Delimiter','tab')
 end
 
 end
