@@ -1,0 +1,27 @@
+# Build pipeline for 1D Solver. 
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: $(Build.SourcesDirectory)
+    contents: '**' 
+    targetFolder: $(build.artifactstagingdirectory)
+    cleanTargetFolder: true
+
+- task: DeleteFiles@1
+  displayName: 'Remove unneeded files'
+  inputs:
+    SourceFolder: $(build.artifactstagingdirectory)
+    contents: |
+      azure-pipelines.yml
+    
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: $(build.artifactstagingdirectory)
+    artifactName: build
