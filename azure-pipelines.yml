@@ -6,7 +6,27 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+strategy:
+  matrix:
+    R2020b:
+      MATLAB_RELEASE: 'R2020b'
+#    R2021b:
+#      MATLAB_RELEASE: 'R2021b'
+
 steps:
+- task: InstallMATLAB@0
+  inputs:
+    release: $(MATLAB_RELEASE)
+  env:
+    MATHWORKS_SKIP_ACTIVATION: true
+
+- task: RunMATLABCommand@0
+  inputs:
+    command: benchmark
+  env:
+    MATHWORKS_ACCOUNT: $(MATHWORKS_ACCOUNT)
+    MATHWORKS_TOKEN: $(MATHWORKS_TOKEN) # valid until March 1st 2023
+
 - task: CopyFiles@2
   inputs:
     sourceFolder: $(Build.SourcesDirectory)
