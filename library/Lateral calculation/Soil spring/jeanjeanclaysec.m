@@ -53,7 +53,7 @@ cutop   = element.cu(i,1);          % Small Strain Shear Modulus [kPa] in top
 cubot   = element.cu(i,2);          % Small Strain Shear Modulus in bottom
 
 fs=100;                             % value fo 100 was taken from Jeanjean 2009
-Limit_on_y = 1e-4;                  % without this limit there might be convergancy problem
+Limit_on_y = 1e-3;                  % without this limit there might be convergancy problem
 
 % -------- Determination of A ---------------------------------------------
 
