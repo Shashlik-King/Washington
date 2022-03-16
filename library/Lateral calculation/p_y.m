@@ -27,7 +27,7 @@ for c = 1:(nelem-1)
         upy_top(c,:) = zeros(1,17);
         upy_bot(c,:) = upy_top(c,:);
         
-    elseif  strcmp(element.model_py(c),'API sand') || strcmp(element.model_py(c),'Kirsch sand') || strcmp(element.model_py(c),'Kallehave sand')|| strcmp(element.model_py(c),'PISA sand')|| strcmp(element.model_py(c),'PISA clay') || strcmp(element.model_py(c),'PISA Bothkennar clay') || strcmp(element.model_py(c),'PISA Cowden clay') || strcmp(element.model_py(c),'PISA Upper clay') || strcmp(element.model_py(c),'PISA Till') || strcmp(element.model_py(c),'PISA Chalk')
+    elseif  strcmp(element.model_py(c),'API sand') || strcmp(element.model_py(c),'Kirsch sand') || strcmp(element.model_py(c),'Kallehave sand') || strcmp(element.model_py(c),'Jeanjean clay')|| strcmp(element.model_py(c),'PISA sand')|| strcmp(element.model_py(c),'PISA clay') || strcmp(element.model_py(c),'PISA Bothkennar clay') || strcmp(element.model_py(c),'PISA Cowden clay') || strcmp(element.model_py(c),'PISA Upper clay') || strcmp(element.model_py(c),'PISA Till') || strcmp(element.model_py(c),'PISA Chalk')
         %contains(element.model_py(c),'EW_sand') ||
         %         yc = 0.10;
 %         upy_top(c,:) = [0 0.02 0.05 0.10 0.15 0.2 0.25 0.30 0.37 0.45 0.5 0.65 0.85 1 1.5]*yc;
@@ -45,8 +45,8 @@ for c = 1:(nelem-1)
         
     elseif  strcmp(element.model_py(c),'API clay') || strcmp(element.model_py(c),'Stiff clay w/o free water') || strcmp(element.model_py(c),'Kirsch soft clay') || strcmp(element.model_py(c),'Kirsch stiff clay')
         %contains(element.model_py(c),'Cowden Clay') ||
-        yc_top(c) = 2.5*element.epsilon50(c,1)*element.diameter(c);
-        yc_bot(c) = 2.5*element.epsilon50(c,2)*element.diameter(c);
+        yc_top(c) = 2.5*element.epsilon50(c,1)*pile.diameter;
+        yc_bot(c) = 2.5*element.epsilon50(c,2)*pile.diameter;
 %         if strcmp(element.model_py(c),'API clay') || strcmp(element.model_py(c),'Kirsch soft clay')
 %             ylimit_top(c) = 15*yc_top(c);
 %             ylimit_bot(c) = 15*yc_bot(c);

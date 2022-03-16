@@ -291,7 +291,116 @@ for i=1:nelem %through all elements
                 PU=PU+delta_PU;
             end
         end
-        
+
+        %% -------------------------------------------------------------------------
+        % Jeanjean (2009) - Clay py curve
+        % -------------------------------------------------------------------------
+    elseif strcmp(element.model_py(i),'Jeanjean clay')
+        for top_bottom=1:2 %looping through top and bottom node of each layer
+            
+            % Correcting errors causing numerical instability
+            if su_top == 0
+                su_top = 1;
+            elseif su_bot == 0
+                su_bot = 1;
+            end
+            
+            % Setting parameters
+            if top_bottom == 1 %top node
+                su = su_top;
+            elseif top_bottom == 2 %bottom node
+                su = su_bot;
+            end
+            
+            % -------- Determination of equivalent height, according to Georgiadis (1983) -------
+            % Determine the imaginary height, heqv, the amount of identical
+            % material as the actual layer on top of the actual node that
+            % would provide the same accumulated resistance as the actual PU_top
+            
+            hr =(6*su*D)/(gamma*D+J*su); %Transition depth, if the actual layer was uniform soil
+            
+            % Integrated resistance for shallow failure from h=0 to h=hr;
+            R_shallow = 0.5*(gamma*D+J*su)*hr^2 + 3*su*D*hr;
+            
+            if R_shallow > PU % shallow failure only down to actual node
+                
+                p  = [0.5*(gamma*D+J*su_top) 3*su_top*D -PU]; %Factors in polynomium that
+                % is solved to determine heqv based on expreesions for moderate depth.
+                
+                r = roots(p);       % Roots for the polynomium described by p.
+                
+                if isreal(r)==0
+                    error('Equivalent length determination is wrong: Clay')
+                end
+                heqv = min(r(r>=0)); %finding the minimum positive root
+                
+            else % both shallow and deep failure above actual node (ie at actual node is deep failure)
+                % heqv is determined as the solution to PU = R_shallow + 9 * su * D *(heqv-hr)
+                heqv = (PU - R_shallow)/(9 * su * D) + hr;
+            end
+
+            
+            % switch in order to turn on/off Georgiadis approach
+            if settings.Georgiadis == 0     % Georgiadis is turned off
+                heqv    = -element.level(i,top_bottom);
+            end
+ 
+             %"Old" interpretation of georgardis, used on LA
+%             sigma = gamma*heqv;
+%             if display; disp('Old Georgiadis interpretation'); display=0; end
+            
+%             
+            %"New" interpretation of georgardis
+            if top_bottom==1 %top node
+                sigma = node.sigma_v_eff(i);
+            elseif top_bottom==2 %bottom node
+                sigma = node.sigma_v_eff(i+1);
+            end
+            heqv = sigma/gamma; %GMME F2
+%             if display; disp('New Georgiadis interpretation'); display=0; end
+
+            % -------- Determination of hr, taking Georgiadis' principle into consideration
+            % This means that the layer is assumed to extent infinitely
+            % below the actual node, but the actual stress at the node
+            % level is taken into consideration together with the
+            % determined equivalent depth
+            % An auxiliary height, haux, is introduced. It is the distance
+            % from the considered node (with equivalent depth heqv) to hr depth.
+            % Thus, hr = heqv + haux.
+            % Thus, the equation to solve may be expressed as:
+            % 3 + (sigma_node + gamma_eff * haux)/su + J * hr / D = 9
+            % If haux is negative, the failure is deep (since hr < heqv).
+            
+            haux = (6-sigma/su-J*heqv/D)/(gamma/su+J/D);
+            hr = heqv + haux;
+            
+            % -------- Determination of pu according to Jeanjean (2009)
+
+            pu = element.Np(i)*su*D;
+
+            
+            % -------- Saving the computed values
+            element.pu(i,top_bottom)=pu;
+            element.heqv(i,top_bottom)=heqv;
+            element.hr(i,top_bottom)=hr;
+            
+            % -------- Integrating pu down each element
+            if top_bottom==1 %if this is an evaluation of the top spring
+                if hr>heqv+h_segment %if only shallow failure exists down to the bottom spring
+                    delta_PU=0.5*(gamma*D+J*su)*((heqv+h_segment)^2-heqv^2) + (3*su+sigma-gamma*heqv)*D*h_segment;
+                elseif hr<heqv %if deep failure both at top and bottom spring
+                    delta_PU = 9 * su * D * h_segment;
+                else %combined failure
+                    h_upper = hr - heqv; 
+                    h_lower = heqv + h_segment - hr;
+                    delta_PU1 = 0.5*(gamma*D+J*su)*((heqv+h_upper)^2-heqv^2) + (3*su+sigma-gamma*heqv)*D*h_upper; %shallow part
+                    delta_PU2 = 9 * su * D * h_lower; %deep part
+                    delta_PU  = delta_PU1 + delta_PU2;
+                end
+                PU=PU+delta_PU;
+            end
+        end
+                
         %% -------------------------------------------------------------------------
         % Stiff clay - Reese et al. (1975)
         % -------------------------------------------------------------------------
