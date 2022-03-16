@@ -312,71 +312,79 @@ for i=1:nelem %through all elements
                 su = su_bot;
             end
             
-            % -------- Determination of equivalent height, according to Georgiadis (1983) -------
-            % Determine the imaginary height, heqv, the amount of identical
-            % material as the actual layer on top of the actual node that
-            % would provide the same accumulated resistance as the actual PU_top
-            
-            hr =(6*su*D)/(gamma*D+J*su); %Transition depth, if the actual layer was uniform soil
-            
-            % Integrated resistance for shallow failure from h=0 to h=hr;
-            R_shallow = 0.5*(gamma*D+J*su)*hr^2 + 3*su*D*hr;
-            
-            if R_shallow > PU % shallow failure only down to actual node
-                
-                p  = [0.5*(gamma*D+J*su_top) 3*su_top*D -PU]; %Factors in polynomium that
-                % is solved to determine heqv based on expreesions for moderate depth.
-                
-                r = roots(p);       % Roots for the polynomium described by p.
-                
-                if isreal(r)==0
-                    error('Equivalent length determination is wrong: Clay')
-                end
-                heqv = min(r(r>=0)); %finding the minimum positive root
-                
-            else % both shallow and deep failure above actual node (ie at actual node is deep failure)
-                % heqv is determined as the solution to PU = R_shallow + 9 * su * D *(heqv-hr)
-                heqv = (PU - R_shallow)/(9 * su * D) + hr;
-            end
-
-            
-            % switch in order to turn on/off Georgiadis approach
-            if settings.Georgiadis == 0     % Georgiadis is turned off
-                heqv    = -element.level(i,top_bottom);
-            end
- 
-             %"Old" interpretation of georgardis, used on LA
-%             sigma = gamma*heqv;
-%             if display; disp('Old Georgiadis interpretation'); display=0; end
-            
+%             % -------- Determination of equivalent height, according to Georgiadis (1983) -------
+%             % Determine the imaginary height, heqv, the amount of identical
+%             % material as the actual layer on top of the actual node that
+%             % would provide the same accumulated resistance as the actual PU_top
 %             
-            %"New" interpretation of georgardis
-            if top_bottom==1 %top node
-                sigma = node.sigma_v_eff(i);
-            elseif top_bottom==2 %bottom node
-                sigma = node.sigma_v_eff(i+1);
-            end
-            heqv = sigma/gamma; %GMME F2
-%             if display; disp('New Georgiadis interpretation'); display=0; end
-
-            % -------- Determination of hr, taking Georgiadis' principle into consideration
-            % This means that the layer is assumed to extent infinitely
-            % below the actual node, but the actual stress at the node
-            % level is taken into consideration together with the
-            % determined equivalent depth
-            % An auxiliary height, haux, is introduced. It is the distance
-            % from the considered node (with equivalent depth heqv) to hr depth.
-            % Thus, hr = heqv + haux.
-            % Thus, the equation to solve may be expressed as:
-            % 3 + (sigma_node + gamma_eff * haux)/su + J * hr / D = 9
-            % If haux is negative, the failure is deep (since hr < heqv).
-            
-            haux = (6-sigma/su-J*heqv/D)/(gamma/su+J/D);
-            hr = heqv + haux;
-            
+%             hr =(6*su*D)/(gamma*D+J*su); %Transition depth, if the actual layer was uniform soil
+%             
+%             % Integrated resistance for shallow failure from h=0 to h=hr;
+%             R_shallow = 0.5*(gamma*D+J*su)*hr^2 + 3*su*D*hr;
+%             
+%             if R_shallow > PU % shallow failure only down to actual node
+%                 
+%                 p  = [0.5*(gamma*D+J*su_top) 3*su_top*D -PU]; %Factors in polynomium that
+%                 % is solved to determine heqv based on expreesions for moderate depth.
+%                 
+%                 r = roots(p);       % Roots for the polynomium described by p.
+%                 
+%                 if isreal(r)==0
+%                     error('Equivalent length determination is wrong: Clay')
+%                 end
+%                 heqv = min(r(r>=0)); %finding the minimum positive root
+%                 
+%             else % both shallow and deep failure above actual node (ie at actual node is deep failure)
+%                 % heqv is determined as the solution to PU = R_shallow + 9 * su * D *(heqv-hr)
+%                 heqv = (PU - R_shallow)/(9 * su * D) + hr;
+%             end
+% 
+%             
+%             % switch in order to turn on/off Georgiadis approach
+%             if settings.Georgiadis == 0     % Georgiadis is turned off
+%                 heqv    = -element.level(i,top_bottom);
+%             end
+%  
+%              %"Old" interpretation of georgardis, used on LA
+% %             sigma = gamma*heqv;
+% %             if display; disp('Old Georgiadis interpretation'); display=0; end
+%             
+% %             
+%             %"New" interpretation of georgardis
+%             if top_bottom==1 %top node
+%                 sigma = node.sigma_v_eff(i);
+%             elseif top_bottom==2 %bottom node
+%                 sigma = node.sigma_v_eff(i+1);
+%             end
+%             heqv = sigma/gamma; %GMME F2
+% %             if display; disp('New Georgiadis interpretation'); display=0; end
+% 
+%             % -------- Determination of hr, taking Georgiadis' principle into consideration
+%             % This means that the layer is assumed to extent infinitely
+%             % below the actual node, but the actual stress at the node
+%             % level is taken into consideration together with the
+%             % determined equivalent depth
+%             % An auxiliary height, haux, is introduced. It is the distance
+%             % from the considered node (with equivalent depth heqv) to hr depth.
+%             % Thus, hr = heqv + haux.
+%             % Thus, the equation to solve may be expressed as:
+%             % 3 + (sigma_node + gamma_eff * haux)/su + J * hr / D = 9
+%             % If haux is negative, the failure is deep (since hr < heqv).
+%             
+%             haux = (6-sigma/su-J*heqv/D)/(gamma/su+J/D);
+%             hr = heqv + haux;
+%             
             % -------- Determination of pu according to Jeanjean (2009)
-
-            pu = element.Np(i)*su*D;
+            landa = -1/((su/element.level(i,top_bottom))*D);
+            if landa<6
+                zeta = 0.25+0.05*landa;
+            else
+                zeta = 0.55;
+            end
+            
+            Np = element.Np(i)-4*exp(zeta*element.level(i,top_bottom)/D);
+            
+            pu = Np * su * D ;
 
             
             % -------- Saving the computed values
