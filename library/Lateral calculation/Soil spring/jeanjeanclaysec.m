@@ -53,7 +53,7 @@ cutop   = element.cu(i,1);          % Small Strain Shear Modulus [kPa] in top
 cubot   = element.cu(i,2);          % Small Strain Shear Modulus in bottom
 
 fs=100;                             % value fo 100 was taken from Jeanjean 2009
-Limit_on_y = 1e-3;                  % without this limit there might be convergancy problem
+k_limit = 10;                    % without this limit there might be convergancy problem
 
 % -------- Determination of A ---------------------------------------------
 
@@ -84,12 +84,10 @@ Abot    = element.A(i,2);
 % kstop is the tangent stiffness, i.e. kstop = dp/dy evaluated at y = 0. 
 % Similar for kbot
 
-if ytop <= Limit_on_y;
+if ytop == 0
     % to aviod problem with calculation at y = 0
-    ytop = Limit_on_y; 
-end
-
-if xtop == 0;
+    kstop = k_limit*G0top; 
+elseif xtop == 0
     kstop = 0;
 else
     % Expression based on 
@@ -97,17 +95,25 @@ else
 		kstop = 0.8*putop/ytop*tanh( sqrt(ytop/D) * G0top/(fs*cutop));
 	else
 		kstop = putop/ytop*tanh( sqrt(ytop/D) * G0top/(fs*cutop));
-	end
+    end
+    
+    %mkae sure siffness has a cap
+    if kstop>(k_limit*G0top)
+        kstop = k_limit*G0top;
+    end    
 end
 
-if ybot <= Limit_on_y;
+if ybot ==0
     % to aviod problem with calculation at y = 0
-    ybot = Limit_on_y;
-end
-
-if strcmp(loads.static_cyclic,'cyclic') % cyclic case
+    ksbot = k_limit*G0bot;
+else
+    if strcmp(loads.static_cyclic,'cyclic') % cyclic case
 		ksbot = 0.8*pubot/ybot*tanh( sqrt(ybot/D) * G0bot/(fs*cubot));
 	else
-		ksbot = pubot/ybot*tanh( sqrt(ybot/D) * G0bot/(fs*cubot));;
-	end
+		ksbot = pubot/ybot*tanh( sqrt(ybot/D) * G0bot/(fs*cubot));
+    end
+    %mkae sure siffness has a cap
+    if ksbot>(k_limit*G0bot)
+        ksbot = k_limit*G0bot;
+    end
 end

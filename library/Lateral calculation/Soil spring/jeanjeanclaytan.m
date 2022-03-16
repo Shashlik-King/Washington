@@ -54,7 +54,7 @@ cutop   = element.cu(i,1);          % Small Strain Shear Modulus [kPa] in top
 cubot   = element.cu(i,2);          % Small Strain Shear Modulus in bottom
 
 fs = 100;                           % value fo 100 was taken from Jeanjean 2009
-Limit_on_y = 1e-3;                  % without this limit there might be convergancy problem
+k_limit = 10;                    % without this limit there might be convergancy problem
 % -------- Determination of A ---------------------------------------------
 
 element = A_factor(element,pile,loads,i);
@@ -84,13 +84,10 @@ Abot    = element.A(i,2);
 % Similar for ktbot
 % Expressions based on API(1993) p.65
 
-if ytop <= Limit_on_y;
+if ytop == 0
     % to aviod problem with calculation at y = 0
-    ytop = Limit_on_y; 
-end
-
-
-if xtop == 0;
+    kttop = k_limit*G0top; 
+elseif xtop == 0
     % This statement is included because Kttop = dp/dy cannot be evaluated 
     % at xtop = 0 since putop in this case turns zero. However, the stiff-
     % ness at the soil surface is zero
@@ -100,15 +97,24 @@ else
 		kttop = 0.8*( putop*G0top/(2*fs*cutop*sqrt(D*ytop))  )  /(cosh(sqrt(ytop/D) * G0top/(fs*cutop) ))^2;
 	else
 		kttop = ( putop*G0top/(2*fs*cutop*sqrt(D*ytop))  )  /(cosh(sqrt(ytop/D) * G0top/(fs*cutop) ))^2;
-	end
+    end
+    %mkae sure siffness has a cap
+    if kttop>(k_limit*G0top)
+        kttop = k_limit*G0top;
+    end        
 end
 
-if ybot <= Limit_on_y;
+if ybot == 0
     % to aviod problem with calculation at y = 0
-    ybot = Limit_on_y;
-end
-if strcmp(loads.static_cyclic,'cyclic') % cyclic case
-	ktbot = 0.8*( pubot*G0bot/(2*fs*cubot*sqrt(D*ybot))  )  /(cosh(sqrt(ybot/D) * G0bot/(fs*cubot) ))^2;
+    ktbot = k_limit*G0top;
 else
-	ktbot = ( pubot*G0bot/(2*fs*cubot*sqrt(D*ybot))  )  /(cosh(sqrt(ybot/D) * G0bot/(fs*cubot) ))^2;
+    if strcmp(loads.static_cyclic,'cyclic') % cyclic case
+        ktbot = 0.8*( pubot*G0bot/(2*fs*cubot*sqrt(D*ybot))  )  /(cosh(sqrt(ybot/D) * G0bot/(fs*cubot) ))^2;
+    else
+        ktbot = ( pubot*G0bot/(2*fs*cubot*sqrt(D*ybot))  )  /(cosh(sqrt(ybot/D) * G0bot/(fs*cubot) ))^2;
+    end
+    %mkae sure siffness has a cap
+    if ktbot>(k_limit*G0bot)
+        ktbot = k_limit*G0bot;
+    end    
 end
