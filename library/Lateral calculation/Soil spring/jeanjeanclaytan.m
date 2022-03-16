@@ -2,7 +2,7 @@ function [kttop ktbot] = apisandtan(element,pile,loads,y_topbottom,i)
 %--------------------------------------------------------------------------
 % PURPOSE
 % Compute the tangent spring stiffness [kN/m/m] in the top and the bottom
-% of each pile segment by applying p-y curves according to API(1993).
+% of each pile segment by applying p-y curves according to Jeanjean (2009).
 % 
 % INPUT:  springinput   : cf. mainfile [D phi gamma 1]
 %                         1 = static behaviour
@@ -19,6 +19,7 @@ function [kttop ktbot] = apisandtan(element,pile,loads,y_topbottom,i)
 % APPROVED        : 
 
 % LAST MODIFIED   : MDGI    15.03.2022   Programming
+% ATTENTION!!!! factor of 0.8 for cyclic and fs =100 is hard coded here !!!
 
 %--------------------------------------------------------------------------
 
@@ -52,7 +53,8 @@ G0bot   = element.G0(i,2);          % Small Strain Shear Modulus in bottom
 cutop   = element.cu(i,1);          % Small Strain Shear Modulus [kPa] in top
 cubot   = element.cu(i,2);          % Small Strain Shear Modulus in bottom
 
-fs = 100;% a factor to be calibrated from FEM, but here it is assumed.
+fs = 100;                           % value fo 100 was taken from Jeanjean 2009
+Limit_on_y = 1e-4;                  % without this limit there might be convergancy problem
 % -------- Determination of A ---------------------------------------------
 
 element = A_factor(element,pile,loads,i);
@@ -82,9 +84,9 @@ Abot    = element.A(i,2);
 % Similar for ktbot
 % Expressions based on API(1993) p.65
 
-if ytop == 0;
+if ytop <= Limit_on_y;
     % to aviod problem with calculation at y = 0
-    ytop = 1e-5; 
+    ytop = Limit_on_y; 
 end
 
 
@@ -101,11 +103,10 @@ else
 	end
 end
 
-if ybot == 0;
+if ybot <= Limit_on_y;
     % to aviod problem with calculation at y = 0
-    ybot = 1e-5; 
+    ybot = Limit_on_y;
 end
-
 if strcmp(loads.static_cyclic,'cyclic') % cyclic case
 	ktbot = 0.8*( pubot*G0bot/(2*fs*cubot*sqrt(D*ybot))  )  /(cosh(sqrt(ybot/D) * G0bot/(fs*cubot) ))^2;
 else

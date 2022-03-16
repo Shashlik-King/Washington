@@ -1,10 +1,10 @@
 function [ID,settings,soil,pile,loads,data,plots] = Initialise()
-ID = {'benchmark'};
+ID = {'Test1'};
 %--------------------------------------------------------------------------
 %% Soil and pile input
 %--------------------------------------------------------------------------
 settings.database               = 'Manual';       % if 'Database' the database module is activated. If 'Manual' input is taken from manual_data_input.xlsx
-settings.PISA_database          = 1;              % Switch for PISA database usage (1 = on, 0 = off)
+settings.PISA_database          = 0;              % Switch for PISA database usage (1 = on, 0 = off)
 settings.psf_switch = 0;
 % interim settings
 settings.interimloads           = 0;

@@ -2,7 +2,7 @@ function [kstop ksbot] = apisandsec(element,pile,loads,y_topbottom,i)
 %--------------------------------------------------------------------------
 % PURPOSE
 % Compute the secant spring stiffness [kN/m/m] in the top and the bottom of
-% each pile segment by applying p-y curves according to API(1993).
+% each pile segment by applying p-y curves according to Jeanjean (2009).
 % 
 % INPUT:  springinput   : cf. mainfile [D phi gamma 1]
 %                         1 = static behaviour
@@ -19,7 +19,7 @@ function [kstop ksbot] = apisandsec(element,pile,loads,y_topbottom,i)
 % APPROVED        : 
 
 % LAST MODIFIED   : MDGI    15.03.2022   Programming
-
+% ATTENTION!!!! factor of 0.8 for cyclic and fs =100 is hard coded here !!!
 %--------------------------------------------------------------------------
 
 % -------- Initializing pile and soil parameters --------------------------
@@ -53,6 +53,7 @@ cutop   = element.cu(i,1);          % Small Strain Shear Modulus [kPa] in top
 cubot   = element.cu(i,2);          % Small Strain Shear Modulus in bottom
 
 fs=100;                             % value fo 100 was taken from Jeanjean 2009
+Limit_on_y = 1e-4;                  % without this limit there might be convergancy problem
 
 % -------- Determination of A ---------------------------------------------
 
@@ -83,9 +84,9 @@ Abot    = element.A(i,2);
 % kstop is the tangent stiffness, i.e. kstop = dp/dy evaluated at y = 0. 
 % Similar for kbot
 
-if ytop == 0;
+if ytop <= Limit_on_y;
     % to aviod problem with calculation at y = 0
-    ytop = 1e-5; 
+    ytop = Limit_on_y; 
 end
 
 if xtop == 0;
@@ -99,9 +100,9 @@ else
 	end
 end
 
-if ybot == 0;
+if ybot <= Limit_on_y;
     % to aviod problem with calculation at y = 0
-    ybot = 1e-5;
+    ybot = Limit_on_y;
 end
 
 if strcmp(loads.static_cyclic,'cyclic') % cyclic case
