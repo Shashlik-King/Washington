@@ -99,7 +99,7 @@ soil.RQD                    = num(3:3+n_layers-1,35); % [-]
 soil.Nq                     = num(3:3+n_layers-1,36); % [-]
 soil.degradation.value_tz_t = num(3:3+n_layers-1,37); % [m]
 soil.degradation.value_tz_z = num(3:3+n_layers-1,38); % [m]
-
+soil.Np                     = num(3:3+n_layers-1,46); % [m]
 
 
 

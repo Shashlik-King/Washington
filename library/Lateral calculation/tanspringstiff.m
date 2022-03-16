@@ -52,6 +52,9 @@ elseif strcmp(element.model_py(i),'Stiff clay w/o free water')
     
 elseif strcmp(element.model_py(i),'Kirsch stiff clay')
     [kttop ktbot] = kirschstiffclaytan(element,pile,loads,y_topbottom/element.degradation_py_y(i),i);
+       
+elseif strcmp(element.model_py(i),'Jeanjean clay')
+    [kttop ktbot] = jeanjeanclaytan(element,pile,loads,y_topbottom/element.degradation_py_y(i),i);    
     
 elseif strcmp(element.model_py(i),'Modified Weak rock')
     [kttop ktbot] = weakrocktan(element,pile,loads,y_topbottom/element.degradation_py_y(i),i);

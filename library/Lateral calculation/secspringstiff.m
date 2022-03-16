@@ -53,6 +53,9 @@ elseif strcmp(element.model_py(i),'Reese stiff clay')
 elseif strcmp(element.model_py(i),'Stiff clay w/o free water')
     [kstop ksbot] = stiffclay_w_o_water_sec(element,pile,loads,y_topbottom/element.degradation_py_y(i),i);
     
+elseif strcmp(element.model_py(i),'Jeanjean clay')
+    [kstop ksbot] = jeanjeanclaysec(element,pile,loads,y_topbottom/element.degradation_py_y(i),i);
+    
 elseif strcmp(element.model_py(i),'Kirsch stiff clay')
     [kstop ksbot] = kirschstiffclaysec(element,pile,loads,y_topbottom/element.degradation_py_y(i),i);
     
