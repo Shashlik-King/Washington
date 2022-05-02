@@ -8,19 +8,19 @@ cprintf('black','---------------------------------------------------------------
 % system('taskkill /F /IM EXCEL.EXE');
 copyfile('input/Initialise.m', 'temp/Initialise_temp.m','f') % move COSPIN input to a temporary folder
 % Unit test 1 - reaction curve creator
-copyfile('benchmark\Initialise_unit_test_1.m', 'input\Initialise.m','f') % replace normal input by benchmarking input
+copyfile('benchmark/Initialise_unit_test_1.m', 'input/Initialise.m','f') % replace normal input by benchmarking input
 run_COSPIN % run Inverse model
 % Unit test 2 - pile response output
-copyfile('benchmark\Initialise_unit_test_2.m', 'input\Initialise.m','f') % replace normal input by benchmarking input
+copyfile('benchmark/Initialise_unit_test_2.m', 'input/Initialise.m','f') % replace normal input by benchmarking input
 run_COSPIN % run Inverse model
-copyfile('temp\Initialise_temp.m', 'input\Initialise.m','f') % copy original input file back to the main reading folder
+copyfile('temp/Initialise_temp.m', 'input/Initialise.m','f') % copy original input file back to the main reading folder
 
 %% Settings
 tolerance = 0.000000001;
 
 %% Benchmarking
-path_benchmark_ref  = 'benchmark\';                         % path for the reference datasets
-path_benchmark_new  = 'output\';             % path for the newly ran datasets
+path_benchmark_ref  = 'benchmark/';                         % path for the reference datasets
+path_benchmark_new  = 'output/';             % path for the newly ran datasets
 files = {'deflection','disp','load'}; % list fo files used for comparison
 for i = 1:size(files,2)
     %% Read benchmark model and new model

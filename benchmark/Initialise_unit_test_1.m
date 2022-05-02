@@ -70,7 +70,7 @@ settings.torsion                = 0;        % calculate torsional stiffness? 1 =
 %--------------------------------------------------------------------------
 loads.static_cyclic             = 'cyclic'; % 'cyclic' or 'static' in accordance with DNV OS-J101
 loads.n_cycles                  = 100;      % Number of cycles, relevant for Stiff clay w/o water only!
-loads.A                         = 'API';    % use API or TUHH (Dührkop) approach for determination of A, relevant for API/Kirsch sand
+loads.A                         = 'API';    % use API or TUHH (Dï¿½hrkop) approach for determination of A, relevant for API/Kirsch sand
 
 
 
@@ -98,7 +98,7 @@ settings.mteta	                = 0;        % include uniformly distributed momen
 settings.Georgiadis				= 0;		% apply Georgiadis approach? 1 = yes, 0 = no
 settings.lateralmultipliers 	= 0; 		% account for p and y multipliers: 0-> not accounted 1-> accounted
 settings.rotationalmultipliers  = 0;        % account for m and theta multipliers: 0-> not accounted 1-> accounted
-settings.ULS                    = 0;        % 1 = Integration of mobilisable soil resistance in accordance with EA-Phähle approach is plotted, 0 = no plot
+settings.ULS                    = 0;        % 1 = Integration of mobilisable soil resistance in accordance with EA-Phï¿½hle approach is plotted, 0 = no plot
 settings.lat_cap_10_crit        = 0;        % 
 
 % Critical pile length settings
@@ -125,7 +125,7 @@ end
 settings.PSI                    = 0;        % Create PSI file? 1 = yes, 0 = no
 settings.ANSYS                  = 0;        % Create ANSYS ASAS file? 1 = yes, 0 = no
 settings.appendix               = 0;        % Create appendix for report (calculation log)? 1 = yes, 0 = no
-data.save_path                  = 'output\';% Saves files in defined working folder, for current 'pwd'
+data.save_path                  = 'output/';% Saves files in defined working folder, for current 'pwd'
 settings.SSI2db                 = 0;        % Save SSI-curves in database? 1 = yes, 0 = no
 settings.update_db              = 0;        % update the results in MySQL database (1 = yes, 0 = no)
 settings.save_plots             = 0;        % save plots in output folder (1 = yes, 0 =no)
