@@ -315,11 +315,11 @@ if plots.deflection_plot == 1 && soil.psf == 0
     ax.MinorGridAlpha = 0.2;
     set(gca,'XMinorTick','on','YMinorTick','on')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\deflection_plot_',data.location,'.png'])
+        saveas(gcf,[data.save_path,'\deflection_plot_',data.location,'_analysisID=',data.analysis_id,'.png'])
         saveas(gcf,[data.save_path2,'\deflection_plot.png'])
     end
     save_name2{3} = [pathname2,'\Deflection\',filename,'deflection.png'];
-    print(figure(3),save_name2{3}, '-r300','-dpng');
+    print(figure(3),save_name2{3},'-dpng', '-r300');
     %close(3)
 end
 
@@ -338,7 +338,7 @@ if plots.deflection_plot == 1 && soil.psf == 1
     ax.MinorGridAlpha = 0.2;
     set(gca,'XMinorTick','on','YMinorTick','on')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\deflection_plot_',data.location,'.png'])
+        saveas(gcf,[data.save_path,'\deflection_plot_',data.location,'_analysisID=',data.analysis_id,'.png'])
         saveas(gcf,[data.save_path2,'\deflection_plot.png'])
     end
     save_name2{3} = [pathname2,'\Deflection\',filename,'deflection.png'];
@@ -503,11 +503,11 @@ if plots.permanent_rot_def == 1 && soil.psf==0
     ylabel('Load ratio [-]')
     eval(['legend(''Permanent rotation is ' num2str(output.perm_rot*180/pi,'%.3f') '^o '');'])
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\permanent_rot_def_',data.location,'_',num2str(loads.n_cycles),'.png'])
-        saveas(gcf,[data.save_path2,'\permanent_rot_def_',data.location,'_',num2str(loads.n_cycles),'.png'])
+        saveas(gcf,[data.save_path,'\permanent_rot_def_',data.location,'_',num2str(loads.n_cycles) ,'_analysisID=', data.analysis_id, '.png'])
+        saveas(gcf,[data.save_path2,'\permanent_rot_def_',data.location,'_',num2str(loads.n_cycles),'_analysisID=', data.analysis_id, '.png'])
     end
-% % %     save_name2{5} = [pathname2,'\Perm_rot\',filename,'perm_rotation.png'];
-% % %     print(figure(5),'-dpng',save_name2{5}, '-r300');
+    % % %     save_name2{5} = [pathname2,'\Perm_rot\',filename,'perm_rotation.png'];
+    % % %     print(figure(5),'-dpng',save_name2{5}, '-r300');
     %close(5)
 end
 
@@ -541,7 +541,7 @@ if plots.permanent_rot_def == 1 && soil.psf==1
     ylabel('Load ratio [-]')
     eval(['legend(''Permanent rotation is ' num2str(output.perm_rot*180/pi,'%.3f') '^o '');'])
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\permanent_rot_def_',data.location,'.png'])
+        saveas(gcf,[data.save_path,'\permanent_rot_def_',data.location,'_analysisID=', data.analysis_id,'.png'])
         saveas(gcf,[data.save_path2,'\permanent_rot_def.png'])
     end
     save_name2{5} = [pathname2,'\Perm_rot\',filename,'perm_rotation.png'];
@@ -566,8 +566,11 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
     %  this is valid because the load is applied in equally sized steps - the magnitude of the load doesn't matter, only the fact that it is applied in equally sized steps
     
     F = linspace(0,settings.max_load_ratio,settings.n_max+1)*loads.H; % DNV calc, material factors are applied
-
-
+    
+    if ~isfield(output,'n_possible')
+        error('Increase max_load_ratio in order to plot the load-deflection curve!')
+    end
+    
     output.defl_plot=output.deflections(1,1:min([settings.n_max output.n_possible])+1)*1000;
     output.load_interp=F(1:min([settings.n_max output.n_possible])+1);
     
@@ -613,7 +616,7 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
     if  plots.load_deflection_type == 0
         
         disp_10=interp1([output.load_interp(load1) output.load_interp(load2)],[output.defl_plot(load1) output.defl_plot(load2)],loads.H);
-
+        
         figure(4)
         clf;
         output.H_load_10_dnv=H_load_10;
@@ -652,60 +655,60 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
         output.def_calibration = output.deflections(1,1:min([settings.n_max output.n_possible])+1)*1000;
         output.force_calibration = F(1:min([settings.n_max output.n_possible])+1);
         if settings.save_plots
-            saveas(gcf,[data.save_path,'\utilization_ratio_',data.location,'_DNV.png'])
+            saveas(gcf,[data.save_path,'\utilization_ratio_',data.location,'_DNV', '_analysisID=', data.analysis_id,'.png'])
             saveas(gcf,[data.save_path2,'\utilization_ratio_DNV.png'])
         end
-% % % %         save_name2{4} = [pathname2,'\Utilization_ratio\',filename,'utilization_ratio_DNV.png'];
-% % % %         print(figure(4),'-dpng',save_name2{4}, '-r300');
-       
+        % % % %         save_name2{4} = [pathname2,'\Utilization_ratio\',filename,'utilization_ratio_DNV.png'];
+        % % % %         print(figure(4),'-dpng',save_name2{4}, '-r300');
+        
         %%%% BSH plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
-% % % % % % % % % % % % % % % % % % % % % %     elseif soil.psf==0 && plots.load_deflection_type == 0
-% % % % % % % % % % % % % % % % % % % % % %         disp_10=interp1([output.load_interp(load1) output.load_interp(load2)],[output.defl_plot(load1) output.defl_plot(load2)],loads.H);
-% % % % % % % % % % % % % % % % % % % % % % 
-% % % % % % % % % % % % % % % % % % % % % %         figure(4)
-% % % % % % % % % % % % % % % % % % % % % %         clf;
-% % % % % % % % % % % % % % % % % % % % % %         output.H_load_10_bsh=H_load_10;
-% % % % % % % % % % % % % % % % % % % % % %         output.UR_lat_bsh=loads.H/output.H_load_10_bsh;
-% % % % % % % % % % % % % % % % % % % % % %         
-% % % % % % % % % % % % % % % % % % % % % %         x1=[0 pile.diameter*100];
-% % % % % % % % % % % % % % % % % % % % % %         y1=[output.H_load_10_bsh/1000 output.H_load_10_bsh/1000];
-% % % % % % % % % % % % % % % % % % % % % %         x2=[pile.diameter*100 pile.diameter*100];
-% % % % % % % % % % % % % % % % % % % % % %         y2=[0 output.H_load_10_bsh/1000];
-% % % % % % % % % % % % % % % % % % % % % %         
-% % % % % % % % % % % % % % % % % % % % % %         plot(pile.diameter*100,output.H_load_10_bsh/1000,'or')
-% % % % % % % % % % % % % % % % % % % % % %         hold on
-% % % % % % % % % % % % % % % % % % % % % %         plot(disp_10,loads.H/1000,'og')
-% % % % % % % % % % % % % % % % % % % % % %         plot(output.deflections(1,1:min([settings.n_max output.n_possible])+1)*1000,F(1:min([settings.n_max output.n_possible])+1)/1000,'-kx')
-% % % % % % % % % % % % % % % % % % % % % %         plot(x1,y1,':r')
-% % % % % % % % % % % % % % % % % % % % % %         plot(x2,y2,':r')
-% % % % % % % % % % % % % % % % % % % % % %         % grid setup
-% % % % % % % % % % % % % % % % % % % % % %         grid
-% % % % % % % % % % % % % % % % % % % % % %         ax.GridLineStyle = '-';
-% % % % % % % % % % % % % % % % % % % % % %         ax.GridAlpha = 0.5;
-% % % % % % % % % % % % % % % % % % % % % %         grid minor
-% % % % % % % % % % % % % % % % % % % % % %         ax.MinorGridLineStyle = ':';
-% % % % % % % % % % % % % % % % % % % % % %         ax.MinorGridAlpha = 0.2;
-% % % % % % % % % % % % % % % % % % % % % %         set(gca,'XMinorTick','on','YMinorTick','on')
-% % % % % % % % % % % % % % % % % % % % % %         eval(['title(''Pile head load-displacement curve, UR_B_S_H = ' num2str(output.UR_lat_bsh,'%0.2f') ' '');'])
-% % % % % % % % % % % % % % % % % % % % % %         xlim([0 1000])
-% % % % % % % % % % % % % % % % % % % % % %         legend('Lateral Capacity','ULS Factored Load','Location','SouthEast')
-% % % % % % % % % % % % % % % % % % % % % %         ylabel('Horizontal load at mudline [MN]')
-% % % % % % % % % % % % % % % % % % % % % %         xlabel('Pile head deflection [mm]')
-% % % % % % % % % % % % % % % % % % % % % %         output.def_calibration = output.deflections(1,1:min([settings.n_max output.n_possible])+1)*1000;
-% % % % % % % % % % % % % % % % % % % % % %         output.force_calibration = F(1:min([settings.n_max output.n_possible])+1);
-% % % % % % % % % % % % % % % % % % % % % %         if settings.save_plots
-% % % % % % % % % % % % % % % % % % % % % %             saveas(gcf,[data.save_path,'\utilization_ratio_',data.location,'_BSH.png'])
-% % % % % % % % % % % % % % % % % % % % % %             saveas(gcf,[data.save_path2,'\utilization_ratio_BSH.png'])
-% % % % % % % % % % % % % % % % % % % % % %         end
-% % % % % % % % % % % % % % % % % % % % % %         save_name2{4} = [pathname2,'\Utilization_ratio\',filename,'utilization_ratio_BSH.png'];
-% % % % % % % % % % % % % % % % % % % % % %         print(figure(4),'-dpng',save_name2{4}, '-r300');
+        % % % % % % % % % % % % % % % % % % % % % %     elseif soil.psf==0 && plots.load_deflection_type == 0
+        % % % % % % % % % % % % % % % % % % % % % %         disp_10=interp1([output.load_interp(load1) output.load_interp(load2)],[output.defl_plot(load1) output.defl_plot(load2)],loads.H);
+        % % % % % % % % % % % % % % % % % % % % % %
+        % % % % % % % % % % % % % % % % % % % % % %         figure(4)
+        % % % % % % % % % % % % % % % % % % % % % %         clf;
+        % % % % % % % % % % % % % % % % % % % % % %         output.H_load_10_bsh=H_load_10;
+        % % % % % % % % % % % % % % % % % % % % % %         output.UR_lat_bsh=loads.H/output.H_load_10_bsh;
+        % % % % % % % % % % % % % % % % % % % % % %
+        % % % % % % % % % % % % % % % % % % % % % %         x1=[0 pile.diameter*100];
+        % % % % % % % % % % % % % % % % % % % % % %         y1=[output.H_load_10_bsh/1000 output.H_load_10_bsh/1000];
+        % % % % % % % % % % % % % % % % % % % % % %         x2=[pile.diameter*100 pile.diameter*100];
+        % % % % % % % % % % % % % % % % % % % % % %         y2=[0 output.H_load_10_bsh/1000];
+        % % % % % % % % % % % % % % % % % % % % % %
+        % % % % % % % % % % % % % % % % % % % % % %         plot(pile.diameter*100,output.H_load_10_bsh/1000,'or')
+        % % % % % % % % % % % % % % % % % % % % % %         hold on
+        % % % % % % % % % % % % % % % % % % % % % %         plot(disp_10,loads.H/1000,'og')
+        % % % % % % % % % % % % % % % % % % % % % %         plot(output.deflections(1,1:min([settings.n_max output.n_possible])+1)*1000,F(1:min([settings.n_max output.n_possible])+1)/1000,'-kx')
+        % % % % % % % % % % % % % % % % % % % % % %         plot(x1,y1,':r')
+        % % % % % % % % % % % % % % % % % % % % % %         plot(x2,y2,':r')
+        % % % % % % % % % % % % % % % % % % % % % %         % grid setup
+        % % % % % % % % % % % % % % % % % % % % % %         grid
+        % % % % % % % % % % % % % % % % % % % % % %         ax.GridLineStyle = '-';
+        % % % % % % % % % % % % % % % % % % % % % %         ax.GridAlpha = 0.5;
+        % % % % % % % % % % % % % % % % % % % % % %         grid minor
+        % % % % % % % % % % % % % % % % % % % % % %         ax.MinorGridLineStyle = ':';
+        % % % % % % % % % % % % % % % % % % % % % %         ax.MinorGridAlpha = 0.2;
+        % % % % % % % % % % % % % % % % % % % % % %         set(gca,'XMinorTick','on','YMinorTick','on')
+        % % % % % % % % % % % % % % % % % % % % % %         eval(['title(''Pile head load-displacement curve, UR_B_S_H = ' num2str(output.UR_lat_bsh,'%0.2f') ' '');'])
+        % % % % % % % % % % % % % % % % % % % % % %         xlim([0 1000])
+        % % % % % % % % % % % % % % % % % % % % % %         legend('Lateral Capacity','ULS Factored Load','Location','SouthEast')
+        % % % % % % % % % % % % % % % % % % % % % %         ylabel('Horizontal load at mudline [MN]')
+        % % % % % % % % % % % % % % % % % % % % % %         xlabel('Pile head deflection [mm]')
+        % % % % % % % % % % % % % % % % % % % % % %         output.def_calibration = output.deflections(1,1:min([settings.n_max output.n_possible])+1)*1000;
+        % % % % % % % % % % % % % % % % % % % % % %         output.force_calibration = F(1:min([settings.n_max output.n_possible])+1);
+        % % % % % % % % % % % % % % % % % % % % % %         if settings.save_plots
+        % % % % % % % % % % % % % % % % % % % % % %             saveas(gcf,[data.save_path,'\utilization_ratio_',data.location,'_BSH.png'])
+        % % % % % % % % % % % % % % % % % % % % % %             saveas(gcf,[data.save_path2,'\utilization_ratio_BSH.png'])
+        % % % % % % % % % % % % % % % % % % % % % %         end
+        % % % % % % % % % % % % % % % % % % % % % %         save_name2{4} = [pathname2,'\Utilization_ratio\',filename,'utilization_ratio_BSH.png'];
+        % % % % % % % % % % % % % % % % % % % % % %         print(figure(4),'-dpng',save_name2{4}, '-r300');
     end
     
     %%%% Load-disp plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if plots.load_deflection == 1   
-    if plots.load_deflection_type == 1
-
+    if plots.load_deflection == 1
+        if plots.load_deflection_type == 1
+            
             if settings.n_max < 50
                 disp('To get proper results for the load-deflection curve, settings.n_max should be at least 50')
             end
