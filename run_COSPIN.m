@@ -205,13 +205,20 @@ for loc = 1:length(ID) % Loop through the locations
         %%
 
         % Read PISA database
-        if settings.PISA_database
+        if settings.PISA_database==1
             [database.num,database.txt,database.raw] = xlsread('Data_Base.xlsx','Clay','A1:BP1000'); % reading of Database table
             database.txt = database.txt(4:end,:); % removing top 3 header lines of database
             database.num(isnan(database.num))=0; % NaN in read table due to a `-` or a different characted than a number to be converted to 0
+        elseif settings.PISA_database==2 % Read copcat database from mysql server
+            [database, T1] = read_copcat_database();
         else
             database = 0; % initialisation of the variable to avoind errors when not using PISA
         end
+        
+        if settings.PISA_database==2
+            settings.PISA_database=1; % settings.PISA_database switch is used in many scripts
+        end
+        
         
         output = []; %initialisation of output
         
