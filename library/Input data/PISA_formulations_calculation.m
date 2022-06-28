@@ -145,9 +145,9 @@ end
 % Normalized ultimate lateral displacement
 if element.PISA_prelim_param.Hb(i,1) == 0
     element.PISA_param(i,15) = element.PISA_prelim_param.Hb(i,2);
-elseif element.PISA_prelim_param.Hb(i,5) == 1
+elseif element.PISA_prelim_param.Hb(i,1) == 1
     element.PISA_param(i,15) = element.PISA_prelim_param.Hb(i,2)*(-element.level(i,j)/pile.diameter)+element.PISA_prelim_param.Hb(i,3);
-elseif element.PISA_prelim_param.Hb(i,5) == 2
+elseif element.PISA_prelim_param.Hb(i,1) == 2
     element.PISA_param(i,15) = element.PISA_prelim_param.Hb(i,2)+element.PISA_prelim_param.Hb(i,3)*exp(element.PISA_prelim_param.Hb(i,4)*(-element.level(i,j)/pile.diameter));
 else
     error('wrong type of function defined for a spring')

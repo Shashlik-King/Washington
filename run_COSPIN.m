@@ -83,7 +83,7 @@ for loc = 1:length(ID) % Loop through the locations
         numerical_setting = numerical_settings(analysis_setting.numerical_setting_id,:);
         axial_setting     = axial_settings(analysis_setting.axial_setting_id,:);
         lateral_setting   = lateral_settings(analysis_setting.lateral_setting_id,:);
-        output_setting    = output_settings(analysis_setting.lateral_setting_id,:);
+        output_setting    = output_settings(analysis_setting.output_setting_id,:);
         project_info      = project_infos(analysis_setting.project_info_id,:);
         database_setting  = database_settings(analysis_setting.database_setting_id,:);
         pile_material     = pile_materials(analysis_setting.pile_material_id,:);
@@ -206,7 +206,7 @@ for loc = 1:length(ID) % Loop through the locations
 
         % Read PISA database
         if settings.PISA_database==1
-            [database.num,database.txt,database.raw] = xlsread('Data_Base.xlsx','Clay','A1:BP1000'); % reading of Database table
+            [database.num,database.txt,database.raw] = xlsread('Data_Base.xlsx','Clay','A1:BP100000'); % reading of Database table
             database.txt = database.txt(4:end,:); % removing top 3 header lines of database
             database.num(isnan(database.num))=0; % NaN in read table due to a `-` or a different characted than a number to be converted to 0
         elseif settings.PISA_database==2 % Read copcat database from mysql server
