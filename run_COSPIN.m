@@ -6,9 +6,13 @@ clear
 close all
 clc
 
+input_paths
 if (~isdeployed)
     addpath (genpath('library'));
     addpath (genpath('input'));   %make sure all the functions are available
+    [~,~,raw0]=xlsread('COSPIN_input.xlsx','PROJ');
+else
+    [~,~,raw0]=xlsread([path.input,'/COSPIN_input.xlsx'],'PROJ');
 end
 %--------------------------------------------------------------------------
 % Units: kN, m, s, kPa
@@ -17,7 +21,7 @@ end
 
 %% Import data blocks from the cospin_input
 
-[~,~,raw0]=xlsread('COSPIN_input.xlsx','PROJ');
+
 
 [analysis_settings]=read_data_block('Analysis settings',raw0);
 is_run = analysis_settings.is_run ==1; % filter the desired runs
@@ -37,7 +41,11 @@ analysis_settings = analysis_settings(is_run,:);
 [pile_materials]=read_data_block('Pile material settings',raw0);
 
 % Read LOCATIONS SHEET
-[~,~,Locations]=xlsread('COSPIN_input.xlsx','LOCATIONS');
+if (~isdeployed)
+    [~,~,Locations]=xlsread('COSPIN_input.xlsx','LOCATIONS');
+else
+    [~,~,Locations]=xlsread([path.input,'/COSPIN_input.xlsx'],'LOCATIONS');
+end
 idx1=8; idx2=idx1+10*4-1;
 geometries = Locations(1,idx1:idx2);  cond1 = ~ismissing(string(geometries));
 geometries = geometries(cond1);
@@ -57,7 +65,11 @@ scour_ORD   = loc_info(:,6);
 
 
 % Read LOADS SHEET
-[~,~,Loads]=xlsread('COSPIN_input.xlsx','LOADS');
+if (~isdeployed)
+    [~,~,Loads]=xlsread('COSPIN_input.xlsx','LOADS');
+else
+    [~,~,Loads]=xlsread([path.input,'/COSPIN_input.xlsx'],'LOADS');
+end
 idx1=4; idx2=idx1+10*5-1;
 
 load_types = Loads(1,idx1:idx2);  cond1 = ~ismissing(string(load_types));
@@ -133,7 +145,7 @@ for loc = 1:length(ID) % Loop through the locations
             end
         elseif strcmp(settings.database,'Manual')
             [scour soil pile loads settings] = manual_data_input_excel(pile,data,soil,...
-                loads,settings); % load soil and pile information from Exce-file
+                loads,settings,path); % load soil and pile information from Exce-file
         end
         
         %% Overwrite loads, pile material and geometry settings from manual_data_input_excel
@@ -206,7 +218,11 @@ for loc = 1:length(ID) % Loop through the locations
 
         % Read PISA database
         if settings.PISA_database==1
-            [database.num,database.txt,database.raw] = xlsread('Data_Base.xlsx','Clay','A1:BP100000'); % reading of Database table
+            if (~isdeployed)
+                [database.num,database.txt,database.raw] = xlsread('Data_Base.xlsx','Clay','A1:BP100000'); % reading of Database table
+            else
+                [database.num,database.txt,database.raw] = xlsread([path.input,'/Data_Base.xlsx'],'Clay','A1:BP100000'); % reading of Database table
+            end
             database.txt = database.txt(4:end,:); % removing top 3 header lines of database
             database.num(isnan(database.num))=0; % NaN in read table due to a `-` or a different characted than a number to be converted to 0
         elseif settings.PISA_database==2 % Read copcat database from mysql server
@@ -331,7 +347,7 @@ for loc = 1:length(ID) % Loop through the locations
                 F = linspace(0,1,settings.n_max+1); % this is valid because the load is applied in equally sized steps - the magnitude of the load doesn't matter, only the fact that it is applied in equally sized steps
                 output.elasticstiff = (F(2)-F(1))/(output.deflections(3*plots.node_rot_def,2)-output.deflections(3*plots.node_rot_def,1)); % the unloading/reloading stiffness is calculated as the initial stiffness
             else
-                [output] = plot_functions(element,pile,node,soil,plots,output,settings,i, loads, data,SF);
+                [output] = plot_functions(element,pile,node,soil,plots,output,settings,i, loads, data, path);
             end
             
             

@@ -1,4 +1,4 @@
-function [output] = plot_functions_axial(element,pile,output,Coord,settings,plots,loads,Ex,Ey,Es,i,node,soil,L,G,ii,data)
+function [output] = plot_functions_axial(element,pile,output,Coord,settings,plots,loads,Ex,Ey,Es,i,node,soil,L,G,ii,data,path)
 %--------------------------------------------------------------------------
 % PURPOSE
 % Compute plots for axial calculation.
@@ -13,13 +13,49 @@ function [output] = plot_functions_axial(element,pile,output,Coord,settings,plot
 %--------------------------------------------------------------------------
 %% Initial
 %--------------------------------------------------------------------------
+
+
+
+
 output.plot_node  = node.level(1:end-1)<=soil.toplevel(1,1); % Determines which nodes are below seabed (embedded)
 output.plot_level = node.level(output.plot_node);   % Sorts out the nodes below seabed
+if (~isdeployed)
+    data.save_path2 = [pwd,'/AppendixGenerationFiles/ProjectLocation'];
+    data.save_path = [pwd,'/output'];
+    pathname2 = [pwd,'/library/Output/Temporary_plots']; % temporary folder for plot to be loaded into database by perl, can be specified arbitrarily
 
-data.save_path2 = [pwd,'\AppendixGenerationFiles\ProjectLocation'];
-data.save_path = [pwd,'\output'];														 
-pathname2 = [pwd,'\library\Output\Temporary_plots']; % temporary folder for plot to be loaded into database by perl, can be specified arbitrarily
+else
+    data.save_path2 = [path.output,'/AppendixGenerationFiles/ProjectLocation'];
+    data.save_path = [path.output,'/output'];
+    pathname2 = [path.output,'/library/Output/Temporary_plots']; % temporary folder for plot to be loaded into database by perl, can be specified arbitrarily
+
+end
 filename = [data.location,'_',soil.type,'_']; % general part of each filename
+
+if ~exist(data.save_path2,'dir')
+    mkdir (data.save_path2);
+end
+if ~exist(data.save_path,'dir')
+    mkdir (data.save_path);
+end
+if ~exist(pathname2,'dir')
+    mkdir (pathname2);
+end
+if ~exist([pathname2,'/Axial_capacity'],'dir')
+    mkdir ([pathname2,'/Axial_capacity']);
+end
+if ~exist([pathname2,'/Axial_UR'],'dir')
+    mkdir ([pathname2,'/Axial_UR']);
+end
+if ~exist([pathname2,'/Normal_force'],'dir')
+    mkdir ([pathname2,'/Normal_force']);
+end
+if ~exist([pathname2,'/Axial_load_displacement'],'dir')
+    mkdir ([pathname2,'/Axial_load_displacement']);
+end
+if ~exist([pathname2,'/Axial_displacement'],'dir')
+    mkdir ([pathname2,'/Axial_displacement']);
+end
 %--------------------------------------------------------------------------
 %% Plots
 % -------------------------------------------------------------------------
@@ -78,10 +114,10 @@ if plots.res_vs_pilelength == 1 && i == length(pile.length) && soil.psf==0
     set(gca,'XMinorTick','on','YMinorTick','on')
     legend('Axial utilisation ratio','Selected emb. length','Utilisation ratio - 0.6')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\axial_capacity_',data.location,'.png'])
-		saveas(gcf,[data.save_path2,'\axial_capacity.png'])												   
+        saveas(gcf,[data.save_path,'/axial_capacity_',data.location,'.png'])
+		saveas(gcf,[data.save_path2,'/axial_capacity.png'])												   
     end
-    save_name2{1} = [pathname2,'\Axial_capacity\',filename,'axial_capacity.png']; % temporary file for plot to be loaded into database by perl
+    save_name2{1} = [pathname2,'/Axial_capacity/',filename,'axial_capacity.png']; % temporary file for plot to be loaded into database by perl
     print(figure(1),save_name2{1}, '-r300','-dpng'); % temporary file for plot to be loaded into database by perl
     %close(1)
     
@@ -145,10 +181,10 @@ if plots.res_vs_pilelength == 1 && i == length(pile.length) && soil.psf==1
     set(gca,'XMinorTick','on','YMinorTick','on')
     legend('Axial utilisation ratio','Selected emb. length','Utilisation ratio - 0.6')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\axial_capacity_',data.location,'.png'])
-		saveas(gcf,[data.save_path2,'\axial_capacity.png'])												   
+        saveas(gcf,[data.save_path,'/axial_capacity_',data.location,'.png'])
+		saveas(gcf,[data.save_path2,'/axial_capacity.png'])												   
     end
-    save_name2{1} = [pathname2,'\Axial_capacity\',filename,'axial_capacity.png']; % temporary file for plot to be loaded into database by perl
+    save_name2{1} = [pathname2,'/Axial_capacity/',filename,'axial_capacity.png']; % temporary file for plot to be loaded into database by perl
     print(figure(1),save_name2{1}, '-r300','-dpng'); % temporary file for plot to be loaded into database by perl
     %close(1)
 end
@@ -173,10 +209,10 @@ if plots.UR_axial == 1
     set(gca,'XMinorTick','on','YMinorTick','on')
     title(['Axial UR - ',settings.analysis_loading{ii,1},' L = ' num2str(pile.length(i)) ' m'])
     if settings.save_plots
-       saveas(gcf,[data.save_path,'\Axial_UR_',data.location,'.png'])
-		saveas(gcf,[data.save_path2,'\Axial_UR.png'])											
+       saveas(gcf,[data.save_path,'/Axial_UR_',data.location,'.png'])
+		saveas(gcf,[data.save_path2,'/Axial_UR.png'])											
     end
-    save_name2{2} = [pathname2,'\Axial_UR\',filename,'Axial_UR.png'];
+    save_name2{2} = [pathname2,'/Axial_UR/',filename,'Axial_UR.png'];
 	print(figure(2),'-dpng',save_name2{2}, '-r300')
 end
 
@@ -205,10 +241,10 @@ if plots.normal_force_axial == 1
     set(gca,'XMinorTick','on','YMinorTick','on')
     title(['Normal force - ',settings.analysis_loading{ii,1},' L = ' num2str(pile.length(i)) ' m'])
     if settings.save_plots
-       saveas(gcf,[data.save_path,'\Normal_force_',data.location,'.png'])
-		saveas(gcf,[data.save_path2,'\Normal_force.png'])												
+       saveas(gcf,[data.save_path,'/Normal_force_',data.location,'.png'])
+		saveas(gcf,[data.save_path2,'/Normal_force.png'])												
     end
-    save_name2{3} = [pathname2,'\Normal_force\',filename,'Normal_force.png'];
+    save_name2{3} = [pathname2,'/Normal_force/',filename,'Normal_force.png'];
 	print(figure(3),'-dpng',save_name2{3}, '-r300')
 end 
     
@@ -223,9 +259,9 @@ end
 % %     title('Axial bearing capacity, API method')
 %     title(['Axial bearing capacity API - ',settings.analysis_loading{ii,1},' L = ' num2str(pile.length(i)) ' m'])
 %     if settings.save_plots
-%        saveas(gcf,[data.save_path,'\Axial_resistance_vs_pile_length_',data.location,'.png'])
+%        saveas(gcf,[data.save_path,'/Axial_resistance_vs_pile_length_',data.location,'.png'])
 %     end
-% %     save_name2{2} = [pathname2,'\Axial_resistance_vs_pile_length\',filename,'Axial_resistance_vs_pile_length.png'];
+% %     save_name2{2} = [pathname2,'/Axial_resistance_vs_pile_length/',filename,'Axial_resistance_vs_pile_length.png'];
 % % 	print(figure(2),'-dpng',save_name2{2}, '-r300')
 % end
    
@@ -287,10 +323,10 @@ if plots.load_deflection_axial == 1
     end 
     
     if settings.save_plots
-       saveas(gcf,[data.save_path,'\Axial_load_displacement_',data.location,'.png'])
-		saveas(gcf,[data.save_path2,'\Axial_load_displacement.png'])														   
+       saveas(gcf,[data.save_path,'/Axial_load_displacement_',data.location,'.png'])
+		saveas(gcf,[data.save_path2,'/Axial_load_displacement.png'])														   
     end
-    save_name2{4} = [pathname2,'\Axial_load_displacement\',filename,'Axial_load_displacement.png'];
+    save_name2{4} = [pathname2,'/Axial_load_displacement/',filename,'Axial_load_displacement.png'];
 	print(figure(4),'-dpng',save_name2{4}, '-r300')
 end
 
@@ -318,10 +354,10 @@ end
     title(['Settlement - ',settings.analysis_loading{ii,1},' L = ' num2str(pile.length(i)) ' m'])
     ylim([-pile.length(i) 0]) 
     if settings.save_plots
-       saveas(gcf,[data.save_path,'\Axial_displacement_',data.location,'.png'])
-		saveas(gcf,[data.save_path2,'\Axial_displacement.png'])													  
+       saveas(gcf,[data.save_path,'/Axial_displacement_',data.location,'.png'])
+		saveas(gcf,[data.save_path2,'/Axial_displacement.png'])													  
     end
-    save_name2{5} = [pathname2,'\Axial_displacement\',filename,'Axial_displacement.png'];
+    save_name2{5} = [pathname2,'/Axial_displacement/',filename,'Axial_displacement.png'];
 	print(figure(5),'-dpng',save_name2{5}, '-r300')
 end 
 

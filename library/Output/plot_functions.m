@@ -1,4 +1,4 @@
-function [output] = plot_functions(element,pile,node,soil,plots,output,settings,i, loads, data,SF)
+function [output] = plot_functions(element,pile,node,soil,plots,output,settings,i, loads, data,path)
 %% PLOTTING FUNCTION
 % RECEIVES INPUT FROM MAIN.M TO MAKE PLOTS
 %--------------------------------------------------------------------------
@@ -15,28 +15,67 @@ for k = 1:6
     save_name2{k}     = '0';                     % initialise filenames of plots, temporary plot to be inserted into database
 end
 
-data.save_path2 = [pwd,'\AppendixGenerationFiles\ProjectLocation'];
-data.save_path = [pwd,'\output'];
-pathname2 = [pwd,'\library\Output\Temporary_plots']; % temporary folder for plot to be loaded into database by perl, can be specified arbitrarily
+if (~isdeployed)
+    data.save_path2 = [pwd,'/AppendixGenerationFiles/ProjectLocation'];
+    data.save_path = [pwd,'/output'];
+    pathname2 = [pwd,'/library/Output/Temporary_plots']; % temporary folder for plot to be loaded into database by perl, can be specified arbitrarily
+else
+    data.save_path2 = [path.output,'/AppendixGenerationFiles/ProjectLocation'];
+    data.save_path = [path.output,'/output'];
+    pathname2 = [path.output,'/library/Output/Temporary_plots']; % temporary folder for plot to be loaded into database by perl, can be specified arbitrarily    
+end
 filename = [data.location,'_',soil.type,'_']; % general part of each filename
 
+if ~exist(data.save_path2,'dir')
+    mkdir (data.save_path2);
+end
+if ~exist(data.save_path,'dir')
+    mkdir (data.save_path);
+end
+if ~exist(pathname2,'dir')
+    mkdir (pathname2);
+end
+if ~exist([pathname2,'/Axial_capacity'],'dir')
+    mkdir ([pathname2,'/Axial_capacity']);
+end
+if ~exist([pathname2,'/pilehead_vs_length'],'dir')
+    mkdir ([pathname2,'/pilehead_vs_length']);
+end
+if ~exist([pathname2,'/Deflection'],'dir')
+    mkdir ([pathname2,'/Deflection']);
+end
+if ~exist([pathname2,'/Utilization_ratio'],'dir')
+    mkdir ([pathname2,'/Utilization_ratio']);
+end
+if ~exist([pathname2,'/Utilization_resistance'],'dir')
+    mkdir ([pathname2,'/Utilization_resistance']);
+end
+if ~exist([pathname2,'/Perm_rot'],'dir')
+    mkdir ([pathname2,'/Perm_rot']);
+end
+if ~exist([pathname2,'/load_deflection'],'dir')
+    mkdir ([pathname2,'/load_deflection']);
+end
+if ~exist([pathname2,'/struct_forces'],'dir')
+    mkdir ([pathname2,'/struct_forces']);
+end
 %% write documentation of revision settings for each position
 % by use of the revision no. the applied loads, geometry and soil
 % parameters can be backtracked within the MySQL database
 % F = fopen([pathname,data.location,'_AppliedRevisions_',date,'.dat'],'wt');
-% fprintf(F,'**********************************************************************************************************************************************\n');
-% fprintf(F,'**************************************** Revisions applied for all checks at position %5s **************************************************\n',data.location);
-% fprintf(F,'************************************************************* %s ******************************************************************\n',date);
-%     fprintf(F,'   \n');
-%     fprintf(F,'Global revision: %2d\n',data.revision.global);
-%     fprintf(F,'   \n');
-%     fprintf(F,'Soil revision: %2d\n',data.revision.soil);
-%     fprintf(F,'   \n');
-%     fprintf(F,'Structural revision: %2d\n',data.revision.structure);
-%     fprintf(F,'   \n');
-%     fprintf(F,'Load revision: %2d\n',data.revision.loads);
-%     fprintf(F,'   \n');
-% fprintf(F,'**********************************************************************************************************************************************\n');
+% fprintf(F,'**********************************************************************************************************************************************/n');
+% fprintf(F,'**************************************** Revisions applied for all checks at position %5s **************************************************/n',data.location);
+% fprintf(F,'************************************************************* %s ******************************************************************/n',date);
+%     fprintf(F,'   /n');
+%     fprintf(F,'Global revision: %2d/n',data.revision.global);
+%     fprintf(F,'   /n');
+%     fprintf(F,'Soil revision: %2d/n',data.revision.soil);
+%     fprintf(F,'   /n');
+%     fprintf(F,'Structural revision: %2d/n',data.revision.structure);
+%     fprintf(F,'   /n');
+%     fprintf(F,'Load revision: %2d/n',data.revision.loads);
+%     fprintf(F,'   /n');
+% fprintf(F,'**********************************************************************************************************************************************/n');
 % fclose(F);
 
 %--------------------------------------------------------------------------
@@ -72,9 +111,9 @@ filename = [data.location,'_',soil.type,'_']; % general part of each filename
 %     xticks([0.2 0.4 0.6 0.8 1])
 %     legend('Axial utilisation ratio','Selected emb. length')
 %     if settings.save_plots
-%         saveas(gcf,[data.save_path,'\axial_capacity_',data.location,'.png'])
+%         saveas(gcf,[data.save_path,'/axial_capacity_',data.location,'.png'])
 %     end
-%     save_name2{1} = [pathname2,'\Axial_capacity\',filename,'axial_capacity.png']; % temporary file for plot to be loaded into database by perl
+%     save_name2{1} = [pathname2,'/Axial_capacity/',filename,'axial_capacity.png']; % temporary file for plot to be loaded into database by perl
 %     print(figure(1),save_name2{1}, '-r300','-dpng'); % temporary file for plot to be loaded into database by perl
 %     %close(1)
 % end
@@ -125,10 +164,10 @@ if plots.res_vs_pilelength == 1 && i == length(pile.length) && soil.psf==1
     set(gca,'XMinorTick','on','YMinorTick','on')
     legend('Axial utilisation ratio','Selected emb. length')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\axial_capacity_',data.location,'.png'])
-        saveas(gcf,[data.save_path2,'\axial_capacity.png'])
+        saveas(gcf,[data.save_path,'/axial_capacity_',data.location,'.png'])
+        saveas(gcf,[data.save_path2,'/axial_capacity.png'])
     end
-    save_name2{1} = [pathname2,'\Axial_capacity\',filename,'axial_capacity.png']; % temporary file for plot to be loaded into database by perl
+    save_name2{1} = [pathname2,'/Axial_capacity/',filename,'axial_capacity.png']; % temporary file for plot to be loaded into database by perl
     print(figure(1),save_name2{1}, '-r300','-dpng'); % temporary file for plot to be loaded into database by perl
     %close(1)
 end
@@ -186,7 +225,7 @@ if plots.pilehead_vs_length == 1 && i == length(pile.length) && soil.psf==0
     ax.MinorGridAlpha = 0.2;
     set(gca,'XMinorTick','on','YMinorTick','on')
     xlabel('Pile length [m]')
-    ylabel('Pile head rotation [{\circ}]')
+    ylabel('Pile head rotation [{/circ}]')
     hold off
     subplot(2,1,2)
     hold on
@@ -210,10 +249,10 @@ if plots.pilehead_vs_length == 1 && i == length(pile.length) && soil.psf==0
     ylabel('Relative pile head rotation [%]')
     hold off
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\pilehead_vs_length_',data.location,'.png'])
-        saveas(gcf,[data.save_path2,'\pilehead_vs_length.png'])
+        saveas(gcf,[data.save_path,'/pilehead_vs_length_',data.location,'.png'])
+        saveas(gcf,[data.save_path2,'/pilehead_vs_length.png'])
     end
-    save_name2{2} = [pathname2,'\pilehead_vs_length\',filename,'pilehead_vs_length.png'];
+    save_name2{2} = [pathname2,'/pilehead_vs_length/',filename,'pilehead_vs_length.png'];
     print(figure(2),'-dpng',save_name2{2}, '-r300')
     %close(2)
 end
@@ -268,7 +307,7 @@ end
 %     ax.MinorGridAlpha = 0.2;
 %     set(gca,'XMinorTick','on','YMinorTick','on')
 %     xlabel('Pile length [m]')
-%     ylabel('Pile head rotation [{\circ}]')
+%     ylabel('Pile head rotation [{/circ}]')
 %     hold off
 %     subplot(2,1,2)
 %     hold on
@@ -289,10 +328,10 @@ end
 %     ylabel('Relative pile head rotation [%]')
 %     hold off
 %     if settings.save_plots
-%         saveas(gcf,[data.save_path,'\pilehead_vs_length_',data.location,'.png'])
-% 		saveas(gcf,[data.save_path2,'\pilehead_vs_length.png'])
+%         saveas(gcf,[data.save_path,'/pilehead_vs_length_',data.location,'.png'])
+% 		saveas(gcf,[data.save_path2,'/pilehead_vs_length.png'])
 %     end
-%     save_name2{2} = [pathname2,'\pilehead_vs_length\',filename,'pilehead_vs_length.png'];
+%     save_name2{2} = [pathname2,'/pilehead_vs_length/',filename,'pilehead_vs_length.png'];
 % 	print(figure(2),'-dpng',save_name2{2}, '-r300')
 %     %close(2)
 % end
@@ -315,10 +354,10 @@ if plots.deflection_plot == 1 && soil.psf == 0
     ax.MinorGridAlpha = 0.2;
     set(gca,'XMinorTick','on','YMinorTick','on')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\deflection_plot_',data.location,'_analysisID=',data.analysis_id,'.png'])
-        saveas(gcf,[data.save_path2,'\deflection_plot.png'])
+        saveas(gcf,[data.save_path,'/deflection_plot_',data.location,'_analysisID=',data.analysis_id,'.png'])
+        saveas(gcf,[data.save_path2,'/deflection_plot.png'])
     end
-    save_name2{3} = [pathname2,'\Deflection\',filename,'deflection.png'];
+    save_name2{3} = [pathname2,'/Deflection/',filename,'deflection.png'];
     print(figure(3),save_name2{3},'-dpng', '-r300');
     %close(3)
 end
@@ -338,10 +377,10 @@ if plots.deflection_plot == 1 && soil.psf == 1
     ax.MinorGridAlpha = 0.2;
     set(gca,'XMinorTick','on','YMinorTick','on')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\deflection_plot_',data.location,'_analysisID=',data.analysis_id,'.png'])
-        saveas(gcf,[data.save_path2,'\deflection_plot.png'])
+        saveas(gcf,[data.save_path,'/deflection_plot_',data.location,'_analysisID=',data.analysis_id,'.png'])
+        saveas(gcf,[data.save_path2,'/deflection_plot.png'])
     end
-    save_name2{3} = [pathname2,'\Deflection\',filename,'deflection.png'];
+    save_name2{3} = [pathname2,'/Deflection/',filename,'deflection.png'];
     print(figure(3),save_name2{3}, '-r300','-dpng');
     %close(3)
 end
@@ -366,9 +405,9 @@ if plots.utilization_ratio == 1 && soil.psf==0
     ax.MinorGridAlpha = 0.2;
     set(gca,'XMinorTick','on','YMinorTick','on')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\utilization_ratio_',data.location,'.png'])
+        saveas(gcf,[data.save_path,'/utilization_ratio_',data.location,'.png'])
     end
-    save_name2{4} = [pathname2,'\Utilization_ratio\',filename,'utilization_ratio.png'];
+    save_name2{4} = [pathname2,'/Utilization_ratio/',filename,'utilization_ratio.png'];
     print(figure(4),'-dpng',save_name2{4}, '-r300')
 end
 
@@ -388,10 +427,10 @@ if plots.utilization_ratio == 1 && soil.psf==1
     ax.MinorGridAlpha = 0.2;
     set(gca,'XMinorTick','on','YMinorTick','on')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\utilization_ratio_',data.location,'.png'])
-        saveas(gcf,[data.save_path2,'\utilization_ratio.png'])
+        saveas(gcf,[data.save_path,'/utilization_ratio_',data.location,'.png'])
+        saveas(gcf,[data.save_path2,'/utilization_ratio.png'])
     end
-    save_name2{4} = [pathname2,'\Utilization_ratio\',filename,'utilization_ratio.png'];
+    save_name2{4} = [pathname2,'/Utilization_ratio/',filename,'utilization_ratio.png'];
     print(figure(4),'-dpng',save_name2{4}, '-r300')
 end
 
@@ -415,10 +454,10 @@ if plots.utilization_ratio == 1
     ax.MinorGridAlpha = 0.2;
     set(gca,'XMinorTick','on','YMinorTick','on')
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\utilization_resistance_',data.location,'.png'])
-        saveas(gcf,[data.save_path2,'\utilization_resistance.png'])
+        saveas(gcf,[data.save_path,'/utilization_resistance_',data.location,'.png'])
+        saveas(gcf,[data.save_path2,'/utilization_resistance.png'])
     end
-    save_name2{44} = [pathname2,'\Utilization_resistance\',filename,'utilization_resistance.png'];
+    save_name2{44} = [pathname2,'/Utilization_resistance/',filename,'utilization_resistance.png'];
     print(figure(44),'-dpng',save_name2{4}, '-r300')
 end
 
@@ -503,10 +542,10 @@ if plots.permanent_rot_def == 1 && soil.psf==0
     ylabel('Load ratio [-]')
     eval(['legend(''Permanent rotation is ' num2str(output.perm_rot*180/pi,'%.3f') '^o '');'])
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\permanent_rot_def_',data.location,'_',num2str(loads.n_cycles) ,'_analysisID=', data.analysis_id, '.png'])
-        saveas(gcf,[data.save_path2,'\permanent_rot_def_',data.location,'_',num2str(loads.n_cycles),'_analysisID=', data.analysis_id, '.png'])
+        saveas(gcf,[data.save_path,'/permanent_rot_def_',data.location,'_',num2str(loads.n_cycles) ,'_analysisID=', data.analysis_id, '.png'])
+        saveas(gcf,[data.save_path2,'/permanent_rot_def_',data.location,'_',num2str(loads.n_cycles),'_analysisID=', data.analysis_id, '.png'])
     end
-    % % %     save_name2{5} = [pathname2,'\Perm_rot\',filename,'perm_rotation.png'];
+    % % %     save_name2{5} = [pathname2,'/Perm_rot/',filename,'perm_rotation.png'];
     % % %     print(figure(5),'-dpng',save_name2{5}, '-r300');
     %close(5)
 end
@@ -541,10 +580,10 @@ if plots.permanent_rot_def == 1 && soil.psf==1
     ylabel('Load ratio [-]')
     eval(['legend(''Permanent rotation is ' num2str(output.perm_rot*180/pi,'%.3f') '^o '');'])
     if settings.save_plots
-        saveas(gcf,[data.save_path,'\permanent_rot_def_',data.location,'_analysisID=', data.analysis_id,'.png'])
-        saveas(gcf,[data.save_path2,'\permanent_rot_def.png'])
+        saveas(gcf,[data.save_path,'/permanent_rot_def_',data.location,'_analysisID=', data.analysis_id,'.png'])
+        saveas(gcf,[data.save_path2,'/permanent_rot_def.png'])
     end
-    save_name2{5} = [pathname2,'\Perm_rot\',filename,'perm_rotation.png'];
+    save_name2{5} = [pathname2,'/Perm_rot/',filename,'perm_rotation.png'];
     print(figure(5),'-dpng',save_name2{5}, '-r300');
     %close(5)
 end
@@ -594,7 +633,7 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
     H_load_10_ratio=interp1([output.load_interp(value1) output.load_interp(value2)],[FF_interp(value1) FF_interp(value2)],valuex);
     H_load_10 = H_load_10_ratio*loads.H; % load that corresponds to displacement=10%D
     % matrix_name=['H_load_10_pos_',data.location,'.mat'];
-    % save(['output\rev0.1\mat_files/',matrix_name], 'H_load_10');
+    % save(['output/rev0.1/mat_files/',matrix_name], 'H_load_10');
     
     % interpolation to find the displacement that corresponds to loads.H UR
     load_10=find(abs(output.load_interp-loads.H)==(min(abs(output.load_interp-loads.H))));
@@ -655,10 +694,10 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
         output.def_calibration = output.deflections(1,1:min([settings.n_max output.n_possible])+1)*1000;
         output.force_calibration = F(1:min([settings.n_max output.n_possible])+1);
         if settings.save_plots
-            saveas(gcf,[data.save_path,'\utilization_ratio_',data.location,'_DNV', '_analysisID=', data.analysis_id,'.png'])
-            saveas(gcf,[data.save_path2,'\utilization_ratio_DNV.png'])
+            saveas(gcf,[data.save_path,'/utilization_ratio_',data.location,'_DNV', '_analysisID=', data.analysis_id,'.png'])
+            saveas(gcf,[data.save_path2,'/utilization_ratio_DNV.png'])
         end
-        % % % %         save_name2{4} = [pathname2,'\Utilization_ratio\',filename,'utilization_ratio_DNV.png'];
+        % % % %         save_name2{4} = [pathname2,'/Utilization_ratio/',filename,'utilization_ratio_DNV.png'];
         % % % %         print(figure(4),'-dpng',save_name2{4}, '-r300');
         
         %%%% BSH plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -698,10 +737,10 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
         % % % % % % % % % % % % % % % % % % % % % %         output.def_calibration = output.deflections(1,1:min([settings.n_max output.n_possible])+1)*1000;
         % % % % % % % % % % % % % % % % % % % % % %         output.force_calibration = F(1:min([settings.n_max output.n_possible])+1);
         % % % % % % % % % % % % % % % % % % % % % %         if settings.save_plots
-        % % % % % % % % % % % % % % % % % % % % % %             saveas(gcf,[data.save_path,'\utilization_ratio_',data.location,'_BSH.png'])
-        % % % % % % % % % % % % % % % % % % % % % %             saveas(gcf,[data.save_path2,'\utilization_ratio_BSH.png'])
+        % % % % % % % % % % % % % % % % % % % % % %             saveas(gcf,[data.save_path,'/utilization_ratio_',data.location,'_BSH.png'])
+        % % % % % % % % % % % % % % % % % % % % % %             saveas(gcf,[data.save_path2,'/utilization_ratio_BSH.png'])
         % % % % % % % % % % % % % % % % % % % % % %         end
-        % % % % % % % % % % % % % % % % % % % % % %         save_name2{4} = [pathname2,'\Utilization_ratio\',filename,'utilization_ratio_BSH.png'];
+        % % % % % % % % % % % % % % % % % % % % % %         save_name2{4} = [pathname2,'/Utilization_ratio/',filename,'utilization_ratio_BSH.png'];
         % % % % % % % % % % % % % % % % % % % % % %         print(figure(4),'-dpng',save_name2{4}, '-r300');
     end
     
@@ -727,10 +766,10 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
             output.def_calibration = output.deflections(1,1:min([settings.n_max output.n_possible])+1)*1000;
             output.force_calibration = F(1:min([settings.n_max output.n_possible])+1);
             if settings.save_plots
-                saveas(gcf,[data.save_path,'\load_deflection_',data.location,'.png'])
-                saveas(gcf,[data.save_path2,'\load_deflection.png'])
+                saveas(gcf,[data.save_path,'/load_deflection_',data.location,'.png'])
+                saveas(gcf,[data.save_path2,'/load_deflection.png'])
             end
-            save_name2{6} = [pathname2,'\load_deflection\',filename,'load_deflection.png'];
+            save_name2{6} = [pathname2,'/load_deflection/',filename,'load_deflection.png'];
             print(figure(6),'-dpng',save_name2{6}, '-r300');
         end
     end
@@ -758,9 +797,9 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
         xlabel('Displacement [kNm]')
         grid on
         if settings.save_plots
-            saveas(gcf,[data.save_path,'\struct_forces',data.location,'.png'])
+            saveas(gcf,[data.save_path,'/struct_forces',data.location,'.png'])
         end
-        save_name2{6} = [pathname2,'\struct_forces\',filename,'struct_forces.png'];
+        save_name2{6} = [pathname2,'/struct_forces/',filename,'struct_forces.png'];
         print(figure(6),'-dpng',save_name2{6}, '-r300');
     end
     

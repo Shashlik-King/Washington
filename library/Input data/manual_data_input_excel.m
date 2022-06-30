@@ -1,4 +1,4 @@
-function [scour soil pile loads settings] = manual_data_input_excel(pile,data,soil,loads,settings,SF)
+function [scour soil pile loads settings] = manual_data_input_excel(pile,data,soil,loads,settings,path)
 %% MODULE TO IMPORT MANUAL INPUT DATA FROM EXCEL
 % FILE ENABLING THE USER TO INPUT DATA FROM EXCEL TO GET A BETTER OVERVIEW
 % OF THE DATA INSTEAD OF USING THE MATLAB-FILE, MANUAL_INPUT_DATA.M
@@ -8,8 +8,11 @@ function [scour soil pile loads settings] = manual_data_input_excel(pile,data,so
 %--------------------------------------------------------------------------
 %% Data import
 %--------------------------------------------------------------------------
-
-[num,txt] = xlsread('manual_data_input.xlsx',data.location);
+if (~isdeployed)
+    [num,txt] = xlsread('manual_data_input.xlsx',data.location);
+else
+    [num,txt] = xlsread([path.input,'/manual_data_input.xlsx'],data.location);
+end
 
 
 n_layers = num(1,2);
