@@ -6,7 +6,10 @@ clear
 close all
 clc
 
-input_paths
+%% Read paths info
+[path] = read_JSON('path_input.json');
+
+%% General input read
 if (~isdeployed)
     addpath (genpath('library'));
     addpath (genpath('input'));   %make sure all the functions are available
