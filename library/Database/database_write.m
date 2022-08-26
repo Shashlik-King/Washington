@@ -163,7 +163,7 @@ else    % if specified global revision already exists
     if settings.axial_loading==1 % save results for axial capacity
         axial_capacity_comp  = round(output.Rd(end,2)); % axial capacity in compression [kN], incl. psf
         axial_capacity_tens  = round(output.Rd(end,1)); % axial capacity in tension [kN], incl. psf
-         axial_util_ratio= round(output.axial_util_ratio(end,1) * 100) / 100;   % axial utilisation ratio
+        axial_util_ratio= round(output.axial_util_ratio(end,1) * 100) / 100;   % axial utilisation ratio
         mysqlstr        = ['Update ',table,' set axial_capa_comp=',...
             num2str(axial_capacity_comp),', axial_capa_ten=',num2str(axial_capacity_tens),',axial_util_ratio=',num2str(axial_util_ratio,'%0.2f')...     %',axial_util_ratio=',num2str(axial_util_ratio),
             ' where id=',location,' and rev=',rev_global1,';'];

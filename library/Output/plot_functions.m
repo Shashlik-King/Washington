@@ -804,7 +804,9 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
     end
     
 end
-if settings.update_db, database_write(output,settings,loads,data,plots,save_name2,pile,i,soil); end
+% if settings.update_db
+%	database_write(output,settings,loads,data,plots,save_name2,pile,i,soil); 
+% end
 
 
 end
