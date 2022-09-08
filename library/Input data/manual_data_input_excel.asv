@@ -132,8 +132,8 @@ catch
 end
 
 if (any(isnan(soil.degradation.Cyclic_Ult)))
-    %soil.degradation.Cyclic_Ult(:)=1;
-    error('Wrong data type input! Only full file names or numbers in column AS');
+    soil.degradation.Cyclic_Ult(:)=1;
+    warning('Cyclic_Multiplier for all layers was set to 1 since the');
 end
 soil.degradation.Cyclic_Ult_path=txt(6:6+n_layers-1,45); % [m]
  

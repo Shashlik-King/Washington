@@ -7,7 +7,9 @@ close all
 clc
 
 %% Read paths info
-[path] = read_JSON('path_input.json');
+if isdeployed
+    [path] = read_JSON('path_input.json');
+end
 
 %% General input read
 if (~isdeployed)

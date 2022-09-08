@@ -661,6 +661,15 @@ if plots.load_deflection == 1 % && strcmp(settings.interface,'FAC')
         output.H_load_10_dnv=H_load_10;
         output.UR_lat_dnv=loads.H/output.H_load_10_dnv;
         
+        %% New code section starts - write the ultimate value to a csv file
+        datestr1 = datestr(datetime(),'yyyy_mm_dd_HH_MM_SS');
+        ultimate_loads_msg={[datestr1, ', Location, ', data.location, ' ,H_load_10_dnv, ', num2str(H_load_10)]};
+        filename1=fullfile(data.save_path, 'ultimate_load_log.csv');
+        fid = fopen(filename1,'a+');
+        fprintf(fid,'%s\n',ultimate_loads_msg{:});
+        fclose(fid);
+        %% New code section ends
+
         x1=[0 pile.diameter*100];
         y1=[output.H_load_10_dnv/1000 output.H_load_10_dnv/1000];
         x2=[pile.diameter*100 pile.diameter*100];

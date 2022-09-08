@@ -330,6 +330,48 @@ element.zpeak_Qz                = element.zpeak_Qz(1:nel_tot);
 element.tres                    = element.tres(1:nel_tot);
 element.soil_layer              = element.soil_layer(1:nel_tot);
 
+%% Importing cyclic multipliers from the copcat calculations
+
+if ~isempty([soil.degradation.Cyclic_Ult_path{:}])
+    path1=soil.degradation.Cyclic_Ult_path{1};
+    msg1 = ['Cyclic multipliers were read from the given path : ',soil.degradation.Cyclic_Ult_path{1}]; disp(msg1);
+    load(path1,'cyclic_input');
+            
+    disp('**Interpolating the multiplier according to the soil layering in cospin!')
+    
+    multiplier_copcat_mat = [cyclic_input.p_multiplier, cyclic_input.p_multiplier]';
+    multiplier_copcat_vec = multiplier_copcat_mat(:); % convert to a single column
+
+    depth_copcat_mat = [cyclic_input.element_top, cyclic_input.element_bot]';
+    depth_copcat_vec =   - depth_copcat_mat(:); % convert to a single column
+
+
+    depth_query_mat = [element.level(:,1),element.level(:,2)]';
+    depth_query_vec =  - depth_query_mat(:);
+
+    [multiplier_query_vec]=interp_var(depth_copcat_vec, multiplier_copcat_vec, depth_query_vec); % multiplier value at the top and bottom of each element
+    multiplier_query_mat=[multiplier_query_vec(1:2:end),multiplier_query_vec(2:2:end)]; % separating multiplier values at the top and bottom of each element in two columns
+
+    multiplier_query_avg = mean(multiplier_query_mat,2);  % average of top and bottom multiplier for each element
+    multiplier_query_avg_mat = [multiplier_query_avg, multiplier_query_avg]'; % average multiplier value for the top and bottom of each element
+    multiplier_query_avg_vec = multiplier_query_avg_mat(:);
+
+    hfig = figure; hold on; 
+    hfig.Position = [680/10 678/10 560 420*1.5];
+    h1 = plot(multiplier_copcat_vec, depth_copcat_vec,'-ob');  h1.MarkerSize=15; h1.DisplayName='copcat profile';
+    h2 = plot(multiplier_query_vec, depth_query_vec,'-sr')  ;  h2.MarkerSize=8; h2.DisplayName='Interpolated cospin profile with possibly different values at element tops and bottoms';
+    h3 = plot(multiplier_query_avg_vec, depth_query_vec,'-*k')  ;  h3.DisplayName='Interpolated cospin profile with an average for each element';
+
+
+    leg=legend(); set(leg,'Location','southoutside')
+    xlabel('p Multiplier'); ylabel('Depth [m]');
+
+    set(gca,'Ydir','reverse','XaxisLocation','Top');
+
+    element.cyclic_ult = multiplier_query_avg;
+  
+end
+
 % %adding an extra element below pile tip but with the same properties as the
 %last pile element
 extra_el_height=element.height(end)/5; %extra element height
