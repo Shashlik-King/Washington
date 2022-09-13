@@ -130,6 +130,6 @@ if plots.res_vs_pilelength         == 1
     axial_capacity=Rd.cumulative_comp((pile.axial_elem));
 else
 	pile.axial_elem = size(element.level(:,1),1);
-	output.axial_util_ratio = (loads.Vc/Rd.cumulative_comp((pile.axial_elem)));
+	output.axial_util_ratio = (loads.Vc/Rd.cumulative_comp((pile.axial_elem-1)));
     axial_capacity=Rd.comp;
 end
