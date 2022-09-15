@@ -12,7 +12,9 @@ data.analysis_id = num2str(analysis_setting.id);
 %--------------------------------------------------------------------------
 settings.database               = analysis_setting.input_type{:};       % if 'Database' the database module is activated. If 'Manual' input is taken from manual_data_input.xlsx
 settings.PISA_database          = soil_pile_setting.PISA_database;      % Switch for PISA database usage (1 = on, 0 = off)
-settings.psf_switch = 0;
+settings.psf_switch             = soil_pile_setting.psf_switch;
+settings.psf_undrained          = soil_pile_setting.psf_undrained;
+settings.psf_drained            = soil_pile_setting.psf_drained;
 % interim settings
 settings.interimloads           = soil_pile_setting.interimloads;
 settings.interimgeometry        = soil_pile_setting.interimgeometry;
